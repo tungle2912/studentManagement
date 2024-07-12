@@ -1,0 +1,44 @@
+.navItem{
+  width: 100%;
+  height: 41px;
+  font-weight: 600;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  padding-left: 40px;
+  display: flex;
+  align-items: center;
+  justify-self: center;
+  text-decoration: none;
+  color: #000;
+  .navImg{
+    color: #000;
+    width: 20px;
+    height: 20px;
+  }
+  .text{
+    font-size: 14px;
+    line-height: 17px;
+    padding-left: 15px;
+  }
+}
+.navItem:hover{
+  background-color: #FEAF00;
+  cursor: pointer;
+}
+
+@media (max-width: 768px){
+  .navItem{ 
+    padding-left: 0px;
+    margin: 20px 0px;
+    height: 50px;
+    .navImg{
+      width: 30px;
+      height: 30px;
+    }
+    .text{
+      text-align: center;    
+      font-size: 22px;
+    }
+  }
+ 
+}

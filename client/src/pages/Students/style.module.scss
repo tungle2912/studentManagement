@@ -1,0 +1,25 @@
+.studentContainer{
+  background-color: #F8F8F8;
+  display: flex;
+  flex-direction: column;
+  padding: 0px 30px;
+  height: 100%;
+}
+.table{
+  border-collapse: separate;
+  appearance: none;
+  border-spacing: 0 8px;
+}
+@media (max-width: 768px) {
+  .studentContainer{
+    padding: 0;
+  }
+  .tableStudent {
+    overflow-x: auto;
+    padding: 0px 15px;
+    overflow-y: auto;
+   // height: 100%;
+   // position: relative;
+    width: 100vw;
+  }
+}

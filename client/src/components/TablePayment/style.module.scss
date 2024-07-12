@@ -1,0 +1,76 @@
+.table {
+  width: 100%;
+  text-align: left;
+  border: none;
+  border-top: 0;
+  border-collapse: separate;
+  appearance: none;
+ // height: 100%;
+  border-spacing: 0 8px;
+  .headerRow {
+    font-size: 0.75rem; // 12px
+    font-weight: 600;
+    color: #ACACAC;
+    width: 100%;
+    .headerCell {
+      display: block;
+      padding-top: 22px;
+      padding-bottom: 22px;
+      padding-left: 13px;
+    }
+  }
+  
+  .paymentRow {
+    border-radius: 8px;
+    width: 100%;
+    height: 100%;
+  //  margin-bottom: 20px;
+    background-color: white;
+    font-size: 0.875rem; 
+  //  border-spacing: 8px;
+  .paymentRowItem{
+    padding: 15px 0px 15px 13px;
+    display: block;
+  }
+    .avatarCell {
+      padding-top: 15px;
+      padding-left: 13px;
+      .avatar {
+        height: 55px;
+        width: 65px;
+        object-fit: cover;
+        border-radius: 0.5rem; 
+        overflow: hidden;
+      }
+    }
+    .actionCell {
+      display: flex;
+      align-items: center;
+      gap: 33px;
+    }
+}}
+@media (max-width: 768px) {
+  .table{
+    width: 800px;
+    height: 100%;
+    padding: 0 15px;
+    .headerRow {
+      font-size: 0.65rem; // 12px
+      font-weight: 500;
+      color: #acacac;
+      width: 100%;
+      .headerCell {
+        display: block;
+        padding-top: 5px;
+        padding-bottom: 5px;
+      }
+    }
+    .paymentRow{
+      .paymentRow td{
+        margin-right: 10px;
+      }
+    }
+  }
+}
+
+

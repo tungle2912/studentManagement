@@ -1,0 +1,28 @@
+.inputContainer {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+  width: 100%;
+  font-size: 14px;
+  color: #6C6C6C;
+  .inputContainerLabel{
+    padding-bottom: 10px;
+    font-weight: 600;
+  }
+  .inputContainerInput{
+    height: 44px;
+    padding-left: 15px;
+    border-radius: 4px;
+    border: 1px solid #E5E5E5;
+  
+  }
+  .inputContainerInput:focus{
+    outline: none;
+  }
+  .inputContainerInput::placeholder{
+    font-size: 12px;
+    line-height: 14.63px;
+    color: #CDCDCD;
+    font-weight: 400;
+  }
+}

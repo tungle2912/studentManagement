@@ -1,0 +1,13 @@
+.title{
+  display: block;
+  font-weight: 700;
+  line-height: 26,82px;
+  font-size: 22px;
+  font-family: MontserratBold;
+  padding: 20px 0px;
+}
+@media (max-width: 768px) {
+  .title{
+    padding: 10px 0px;
+  }
+}

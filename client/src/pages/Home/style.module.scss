@@ -1,0 +1,28 @@
+.homeContainer{
+  display: flex;
+  align-items: center; 
+  flex-wrap: wrap;
+  padding-left: 15px;
+}
+.student{
+  background-color:  #F0F9FF;
+}
+.Course{
+  background: #FEF6FB;
+}
+.Payment{
+  background: #FEFBEC;
+}
+.Users{
+  background: linear-gradient(110.42deg, #FEAF00 18.27%, #F8D442 91.84%);
+  background-repeat: no-repeat;
+  background-size: cover;
+
+}
+@media (max-width: 768px) {
+ .homeContainer{
+  padding-left: 0px;
+  width: 90%;
+  margin: 0 auto;
+ }
+}
