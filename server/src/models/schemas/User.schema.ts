@@ -15,6 +15,7 @@ interface UserType {
   username?: string
   avatar?: string
   cover_photo?: string
+  role?: boolean
 }
 
 export default class User {
@@ -31,6 +32,7 @@ export default class User {
   username: string // optional
   avatar: string // optional
   cover_photo: string // optional
+  role: boolean
 
   constructor(user: UserType) {
     const date = new Date()
@@ -47,5 +49,6 @@ export default class User {
     this.username = user.username || ''
     this.avatar = user.avatar || ''
     this.cover_photo = user.cover_photo || ''
+    this.role = user.role || true
   }
 }

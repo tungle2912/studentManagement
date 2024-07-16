@@ -11,7 +11,6 @@
     max-width: 475px;
     width: 100%;
     margin: 0 20px;
-    height: 550px;
     background: #fff;
     border-radius: 20px;
     box-shadow: 2px 5px 10px #0000;
@@ -42,7 +41,7 @@
         font-family: MontserratBold;
       }
       .loginDescription {
-        padding-top: 9px;
+        padding: 9px;
         font-weight: 400;
         font-size: 14px;
         line-height: 17px;
@@ -55,47 +54,48 @@
       padding-top: 30px;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      .loginFormContentDescription {
-        font-weight: 400;
-        font-size: 14px;
-        padding: 27px;
-        .loginFormContentReset {
-          font-weight: 400;
-          color: #f8d442;
-          text-decoration: underline;
-        }
-      }
+    
     }
-  }
-  .loginFormInput {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    max-width: 415px;
-    margin-bottom: 20px;
-    .inputPassword{
-      padding: 0 11px;
-    }
-  }
-  .loginFormInput p {
-    margin-bottom: 10px;
-  }
-  .loginFormInput input{
-    height: 44px;
-  }
-  .loginFormInput span {
-    padding: 0;
-  }
-  .loginFormButton{
-    margin-top: 10px;
-    width: 100%;
-    height: 44px;
-    background-color: #FEAF00;
-    font-weight: 400;
-    font-size: 14px;
   }
   
+}
+.loginFormContentDescription {
+  font-weight: 400;
+  font-size: 14px;
+  padding: 20px 60px 40px 60px;
+  .loginFormContentReset {
+    font-weight: 400;
+    color: #f8d442;
+    text-decoration: underline;
+  }
+}
+.loginFormInput {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 415px;
+  margin-bottom: 20px;
+  margin-top: 10px;
+  .inputPassword{
+    padding: 0 11px;
+  }
+}
+.loginFormInput p {
+  margin-bottom: 10px;
+}
+.loginFormInput input{
+  height: 44px;
+}
+.loginFormInput span {
+  padding: 0;
+}
+.loginFormButton{
+  margin-top: 10px;
+  width: 100%;
+  height: 44px;
+  background-color: #FEAF00;
+  font-weight: 400;
+  font-size: 14px;
 }
 
 @media (max-width: 739px) {

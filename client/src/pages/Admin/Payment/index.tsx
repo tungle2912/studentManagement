@@ -1,9 +1,9 @@
-import StudentHeader from '../../components/StudentHeader'
+import StudentHeader from '../../../components/StudentHeader'
 //import TablePayment from '../../components/TablePayment'
 import styles from './style.module.scss'
-import { listPayments } from '../../constants/listPayments'
+import { listPayments } from '../../../constants/listPayments'
 import { Table, TableColumnsType, TableProps } from 'antd'
-import eye from '../../assets/icons/eye.svg'
+import eye from '../../../assets/icons/eye.svg'
 interface DataType {
   id: React.Key
   name: string

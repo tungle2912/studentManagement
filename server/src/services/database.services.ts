@@ -2,15 +2,16 @@ import { MongoClient, Db, Collection } from 'mongodb'
 import 'dotenv/config'
 import User from '~/models/schemas/User.schema'
 import RefreshToken from '~/models/schemas/RefreshToken.chema'
+import { envConfig } from '~/constants/config'
 
-const uri = `mongodb+srv://${process.env.DBUSERNAME}:${process.env.DBPASSWORD}@studentmanagement.bygjalp.mongodb.net/`
+const uri = `mongodb+srv://${envConfig.dbUsername}:${envConfig.dbPassword}@studentmanagement.bygjalp.mongodb.net/`
 
 class DatabaseService {
   private client: MongoClient
   private db: Db
   constructor() {
     this.client = new MongoClient(uri)
-    this.db = this.client.db(process.env.dbName)
+    this.db = this.client.db(envConfig.dbName)
   }
   async connect() {
     try {

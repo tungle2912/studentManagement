@@ -6,7 +6,7 @@ import { TokenType, UserVerifyStatus } from '~/constants/enums'
 import User from '~/models/schemas/User.schema'
 import { hashPassword } from '~/utils/crypto'
 import { envConfig } from '~/constants/config'
-import { config } from 'dotenv'
+import nodemailer from 'nodemailer'
 import RefreshToken from '~/models/schemas/RefreshToken.chema'
 
 class UsersService {
@@ -73,6 +73,29 @@ class UsersService {
       secretOrPublicKey: envConfig.jwtSecretRefreshToken
     })
   }
+  async sendVerificationEmail(userEmail: string, emailVerifyToken: string) {
+    const transporter = nodemailer.createTransport({
+      service: 'Gmail',
+      auth: {
+        user: envConfig.emailUsername,
+        pass: envConfig.emailPassword
+      },
+      tls: {
+        rejectUnauthorized: false
+      }
+    })
+
+    const verificationLink = `http://localhost:4000/users/verify-email?token=${emailVerifyToken}`
+
+    const mailOptions = {
+      from: envConfig.emailUsername,
+      to: 'tung291203@gmail.com',
+      subject: 'Email Verification',
+      html: `<p>Please click the link below to verify your email:</p><a href="${verificationLink}">Verify Email</a>`
+    }
+
+    await transporter.sendMail(mailOptions)
+  }
   async register(payload: RegisterReqBody) {
     const user_id = new ObjectId()
     const email_verify_token = await this.signEmailVerifyToken({
@@ -95,16 +118,10 @@ class UsersService {
     await databaseService.refreshTokens.insertOne(
       new RefreshToken({ user_id: new ObjectId(user_id), token: Refresh_Token, iat, exp })
     )
-    // Flow verify email
-    // 1. Server send email to user
-    // 2. User click link in email
-    // 3. Client send request to server with email_verify_token
-    // 4. Server verify email_verify_token
-    // 5. Client receive access_token and refresh_token
-    console.log('email_verify_token', email_verify_token)
+    await this.sendVerificationEmail(payload.email, email_verify_token)
+
     return {
-      Access_Token,
-      Refresh_Token
+      message: 'Please check your email to verify your account.'
     }
   }
   async login({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
@@ -117,6 +134,25 @@ class UsersService {
     await databaseService.refreshTokens.insertOne(
       new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token, iat, exp })
     )
+    return {
+      access_token,
+      refresh_token
+    }
+  }
+  async verifyEmail(user_id: string) {
+    const [token] = await Promise.all([
+      this.signAccessAndRefreshToken({ user_id, verify: UserVerifyStatus.Verified }),
+      databaseService.users.updateOne({ _id: new ObjectId(user_id) }, [
+        {
+          $set: {
+            email_verify_token: '',
+            verify: UserVerifyStatus.Verified,
+            updated_at: '$$NOW'
+          }
+        }
+      ])
+    ])
+    const [access_token, refresh_token] = token
     return {
       access_token,
       refresh_token

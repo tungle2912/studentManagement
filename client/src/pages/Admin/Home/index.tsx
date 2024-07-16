@@ -1,5 +1,5 @@
 import styles from './style.module.scss'
-import DashBoardItem from '../../components/DashBoardItem'
+import DashBoardItem from '../../../components/DashBoardItem'
 
 
 function Home() {

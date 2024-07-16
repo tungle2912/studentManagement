@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import { loginController, registerController } from '~/controllers/users.controllers'
-import { loginValidator, registerValidator } from '~/middlewares/users.middlewares'
+import { loginController, registerController, verifyEmailController } from '~/controllers/users.controllers'
+import { emailVerifyTokenValidator, loginValidator, registerValidator } from '~/middlewares/users.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
 export const usersRouter = Router()
 
@@ -19,3 +19,11 @@ usersRouter.post('/register', registerValidator, wrapRequestHandler(registerCont
  * Body: {email: string, password: string,access_token: string}
  */
 usersRouter.post('/login', loginValidator, wrapRequestHandler(loginController))
+
+/**
+ * Description. Verify email when user clinet click on the link in email
+ * Path: /verify-email
+ * Method: POST
+ * body: { email_verify_token: string }
+ */
+usersRouter.get('/verify-email', emailVerifyTokenValidator, wrapRequestHandler(verifyEmailController))

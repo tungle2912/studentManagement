@@ -1,4 +1,4 @@
-import { payment } from '../constants/Types/payment'
+import { payment } from '../Types/payment'
 
 export const listPayments: payment[] = [
   {

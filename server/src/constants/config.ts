@@ -1,9 +1,11 @@
 export const envConfig = {
-  port: (process.env.PORT as string) || 4000,
+  port: (process.env.PORT as string) || 5000,
   host: process.env.HOST as string,
   dbName: process.env.DB_NAME as string,
   dbUsername: process.env.DB_USERNAME as string,
   dbPassword: process.env.DB_PASSWORD as string,
+  emailUsername: process.env.EMAIL_USERNAME as string,
+  emailPassword: process.env.EMAIL_PASSWORD as string,
   dbUsersCollection: process.env.DB_USERS_COLLECTION as string,
   dbRefreshTokensCollection: process.env.DB_REFRESH_TOKENS_COLLECTION as string,
   passwordSecret: process.env.PASSWORD_SECRET as string,

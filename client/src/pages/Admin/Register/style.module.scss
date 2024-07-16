@@ -1,0 +1,147 @@
+.loginContainer {
+  font-family: Montserrat;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(to right, #feaf00, #f8d442);
+  .loginForm {
+    padding: 0 30px;
+    max-width: 475px;
+    width: 100%;
+    margin: 0 20px;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 2px 5px 10px #0000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    .loginFormHeader {
+      margin-top: 44px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      .loginTitle {
+        width: 342.5px;
+        height: 39px;
+        border-left: 6px solid #f8d442;
+        display: block;
+        font-weight: 700;
+        line-height: 39px;
+        font-size: 32px;
+        padding-left: 10px;
+        font-family: MontserratExtraBold;
+      }
+      .loginSignIn {
+        font-size: 22px;
+        font-weight: 500;
+        line-height: 26.82px;
+        margin-top: 43px;
+        font-family: MontserratBold;
+      }
+      .loginDescription {
+        padding: 9px;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 17px;
+        color: #6c6c6c;
+        text-align: center;
+      }
+    }
+    .loginFormContent {
+      width: 100%;
+      padding-top: 30px;
+      display: flex;
+      flex-direction: column;
+    
+    }
+  }
+  
+}
+.loginFormContentDescription {
+  font-weight: 400;
+  font-size: 14px;
+  padding: 0px 60px 40px 60px;
+}
+.loginFormContentReset {
+  font-weight: 400;
+  color: #f8d442;
+  text-decoration: none;
+  text-align: center;
+  margin-bottom: 20px;
+}
+.loginFormInput {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 415px;
+  margin-bottom: 20px;
+  margin-top: 10px;
+  .inputPassword{
+    padding: 0 11px;
+  }
+}
+.loginFormInput p {
+  margin-bottom: 10px;
+}
+.loginFormInput input{
+  height: 44px;
+}
+.loginFormInput span {
+  padding: 0;
+}
+.loginFormButton{
+  margin-top: 10px;
+  width: 100%;
+  height: 44px;
+  background-color: #FEAF00;
+  font-weight: 400;
+  font-size: 14px;
+}
+
+@media (max-width: 739px) {
+  .loginContainer {
+    .loginForm {
+      .loginFormHeader {
+        .loginFormTittle {
+          font-weight: 600;
+          line-height: 25px;
+          font-size: 20px;
+          padding-left: 5px;
+        }
+        .loginSignIn {
+          font-size: 15px;
+          line-height: 26.82px;
+          margin-top: 20px;
+        }
+        .loginDescription {
+          padding-top: 5px;
+          font-weight: 400;
+          font-size: 12px;
+          line-height: 15px;
+          color: #6c6c6c;
+        }
+      }
+    }
+  }
+}
+@media (min-width: 739px) and (max-width: 1023px) {
+  .loginContainer {
+    .loginForm {
+      .loginFormHeader {
+        .loginFormTittle {
+          font-weight: 600;
+          line-height: 28px;
+          font-size: 25px;
+          padding-left: 10px;
+        }
+        .loginSignIn {
+          font-size: 18px;
+          line-height: 26.82px;
+          margin-top: 30px;
+        }
+      }
+    }
+  }
+}

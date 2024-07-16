@@ -1,9 +1,9 @@
 //import TableStudent from '../../components/TableStudent'
-import StudentHeader from '../../components/StudentHeader'
-import listStudents from '../../constants/listStudents'
+import StudentHeader from '../../../components/StudentHeader'
+import listStudents from '../../../constants/listStudents'
 import styles from './style.module.scss'
-import pen from '../../assets/icons/pen.svg'
-import trash from '../../assets/icons/trash.svg'
+import pen from '../../../assets/icons/pen.svg'
+import trash from '../../../assets/icons/trash.svg'
 
 import { Table, TableColumnsType, TableProps } from 'antd'
 interface DataType {

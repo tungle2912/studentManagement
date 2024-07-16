@@ -1,4 +1,4 @@
-import { payment } from '../../constants/Types/payment'
+import { payment } from '../../Types/payment'
 import styles from './style.module.scss'
 import eye from '../../assets/icons/eye.svg'
 type Props = {
@@ -32,22 +32,22 @@ function TablePayment({ payments }: Props) {
       {payments.map((payment) => (
         <tr key={payment.id} className={styles.paymentRow}>
           <td>
-            <span  className={styles.paymentRowItem}>{payment.name}</span>
+            <span className={styles.paymentRowItem}>{payment.name}</span>
           </td>
           <td>
-            <span  className={styles.paymentRowItem}>{payment.paymentSchdule}</span>
+            <span className={styles.paymentRowItem}>{payment.paymentSchdule}</span>
           </td>
           <td>
-            <span  className={styles.paymentRowItem}>{payment.billNumber}</span>
+            <span className={styles.paymentRowItem}>{payment.billNumber}</span>
           </td>
           <td>
-            <span  className={styles.paymentRowItem}>{payment.amountPaid}</span>
+            <span className={styles.paymentRowItem}>{payment.amountPaid}</span>
           </td>
           <td>
-            <span  className={styles.paymentRowItem}>{payment.balanceAmount}</span>
+            <span className={styles.paymentRowItem}>{payment.balanceAmount}</span>
           </td>
           <td>
-            <span  className={styles.paymentRowItem}>{payment.date}</span>
+            <span className={styles.paymentRowItem}>{payment.date}</span>
           </td>
           <td>
             <div className={styles.actionCell}>

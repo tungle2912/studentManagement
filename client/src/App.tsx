@@ -1,21 +1,45 @@
 import './App.css'
 import { useRoutes } from 'react-router-dom'
-import { routes } from './pages/routes'
+import { publicRoutes, privateRoutes } from './pages/routes'
 import MainLayout from './layouts/MainLayout'
 import AuthLayout from './layouts/AuthLayout'
-import Login from './pages/Login'
-import Home from './pages/Home'
-import Payment from './pages/Payment'
-import Students from './pages/Students'
-import Settings from './pages/Settings'
-import Report from './pages/Report'
-import Course from './pages/Course'
-
+import Login from './pages/Admin/Login'
+import Home from './pages/Admin/Home'
+import Payment from './pages/Admin/Payment'
+import Students from './pages/Admin/Students'
+import Settings from './pages/Admin/Settings'
+import Report from './pages/Admin/Report'
+import Course from './pages/Admin/Course'
+import Register from './pages/Admin/Register'
 
 function App() {
   const elements = useRoutes([
     {
-      path: routes.home,
+      path: publicRoutes.login, // /login
+      element: (
+        <AuthLayout>
+          <Login />
+        </AuthLayout>
+      )
+    },
+    {
+      path: publicRoutes.adminLogin, // /login
+      element: (
+        <AuthLayout>
+          <Login />
+        </AuthLayout>
+      )
+    },
+    {
+      path: publicRoutes.register,
+      element: (
+        <AuthLayout>
+          <Register />
+        </AuthLayout>
+      )
+    },
+    {
+      path: privateRoutes.home,
       element: (
         <MainLayout>
           <Home />
@@ -23,23 +47,7 @@ function App() {
       )
     },
     {
-      path: routes.login,
-      element: (
-        <AuthLayout>
-          <Login />
-        </AuthLayout>
-      )
-    },
-    {
-      path: routes.Logout,
-      element: (
-        <AuthLayout>
-          <Login />
-        </AuthLayout>
-      )
-    },
-    {
-      path: routes.payment,
+      path: privateRoutes.payment,
       element: (
         <MainLayout>
           <Payment />
@@ -47,7 +55,7 @@ function App() {
       )
     },
     {
-      path: routes.course,
+      path: privateRoutes.course,
       element: (
         <MainLayout>
           <Course />
@@ -55,7 +63,7 @@ function App() {
       )
     },
     {
-      path: routes.report,
+      path: privateRoutes.report,
       element: (
         <MainLayout>
           <Report />
@@ -63,7 +71,7 @@ function App() {
       )
     },
     {
-      path: routes.students,
+      path: privateRoutes.students,
       element: (
         <MainLayout>
           <Students />
@@ -71,7 +79,7 @@ function App() {
       )
     },
     {
-      path: routes.settings,
+      path: privateRoutes.settings,
       element: (
         <MainLayout>
           <Settings />

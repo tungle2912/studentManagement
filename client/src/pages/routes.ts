@@ -1,11 +1,16 @@
-export const routes = {
-  home: '/home',
+export const publicRoutes = {
+  adminLogin: '/admin/login',
+  home: '/',
   login: '/login',
-  Logout: 'login',
-  dashboard: '/dashboard',
-  payment: '/payment',
-  students: '/students',
-  course: '/course',
-  settings: '/settings',
-  report: '/report'
+  register: '/register'
+} as const
+
+export const privateRoutes = {
+  home: '/admin/',
+  dashboard: '/admin/dashboard',
+  payment: '/admin/payment',
+  students: '/admin/students',
+  course: '/admin/course',
+  settings: '/admin/settings',
+  report: '/admin/report'
 } as const
