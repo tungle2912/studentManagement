@@ -15,6 +15,10 @@ function Register() {
     try {
       const response = await axios.post('/users/register', values)
       console.log(response)
+      const msg = response.data.result.message
+      if (msg) {
+        message.success(msg)
+      }
     } catch (error) {
       const errorMessage =
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

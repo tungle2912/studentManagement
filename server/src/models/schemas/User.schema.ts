@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb'
-import { UserVerifyStatus } from '~/constants/enums'
+import { RoleType, UserVerifyStatus } from '~/constants/enums'
 
 interface UserType {
   _id?: ObjectId
@@ -15,7 +15,7 @@ interface UserType {
   username?: string
   avatar?: string
   cover_photo?: string
-  role?: boolean
+  role?: RoleType
 }
 
 export default class User {
@@ -32,7 +32,7 @@ export default class User {
   username: string // optional
   avatar: string // optional
   cover_photo: string // optional
-  role: boolean
+  role: RoleType
 
   constructor(user: UserType) {
     const date = new Date()
@@ -49,6 +49,6 @@ export default class User {
     this.username = user.username || ''
     this.avatar = user.avatar || ''
     this.cover_photo = user.cover_photo || ''
-    this.role = user.role || true
+    this.role = user.role || RoleType.User
   }
 }

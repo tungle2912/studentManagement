@@ -11,6 +11,7 @@ import { validate } from '~/utils/validation'
 import { TokenPayload } from '~/models/requests/User.requests'
 import { capitalize } from 'lodash'
 import { JsonWebTokenError } from 'jsonwebtoken'
+import { RoleType } from '~/constants/enums'
 
 const passwordSchema: ParamSchema = {
   notEmpty: {
@@ -115,7 +116,36 @@ export const loginValidator = validate(
           options: async (value, { req }) => {
             const user = await databaseService.users.findOne({
               email: value,
-              password: hashPassword(req.body.password)
+              password: hashPassword(req.body.password),
+              role: RoleType.User
+            })
+            if (user === null) {
+              throw new Error(USERS_MESSAGES.EMAIL_OR_PASSWORD_IS_INCORRECT)
+            }
+            req.user = user
+            return true
+          }
+        }
+      },
+      password: passwordSchema
+    },
+    ['body']
+  )
+)
+export const adminLoginValidator = validate(
+  checkSchema(
+    {
+      email: {
+        isEmail: {
+          errorMessage: USERS_MESSAGES.EMAIL_IS_INVALID
+        },
+        trim: true,
+        custom: {
+          options: async (value, { req }) => {
+            const user = await databaseService.users.findOne({
+              email: value,
+              password: hashPassword(req.body.password),
+              role: RoleType.Admin
             })
             if (user === null) {
               throw new Error(USERS_MESSAGES.EMAIL_OR_PASSWORD_IS_INCORRECT)

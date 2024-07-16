@@ -136,7 +136,7 @@ class UsersService {
     )
     return {
       access_token,
-      refresh_token
+      refresh_token,
     }
   }
   async verifyEmail(user_id: string) {

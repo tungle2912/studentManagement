@@ -1,6 +1,6 @@
 import { Button, Form, Input, message } from 'antd'
 import axios from '../../../api/axios'
-import { NavLink, useLocation } from 'react-router-dom'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import Tittle from '../../../common/Tittle'
 import styles from './style.module.scss'
 import { setAccessTokenToLocalCookie, setRefreshTokenToCookie } from '../../../lib/utils'
@@ -8,6 +8,7 @@ import { setAccessTokenToLocalCookie, setRefreshTokenToCookie } from '../../../l
 function Login() {
   const [form] = Form.useForm()
   const location = useLocation()
+  const navigate = useNavigate() // Thêm useNavigate
   const isAdminLogin = location.pathname === '/admin/login'
   const params = new URLSearchParams(window.location.search)
   const email = params.get('email')
@@ -20,16 +21,21 @@ function Login() {
     const url = isAdminLogin ? '/admin/login' : 'users/login'
     try {
       const response = await axios.post(url, values)
-      console.log(response)
-
       const { access_token, refresh_token } = response.data.result
-      console.log(access_token, refresh_token)
       setAccessTokenToLocalCookie(access_token)
       setRefreshTokenToCookie(refresh_token)
-
       message.success('Login successful!')
+      const role = response.data.role
+      if (role == 1) {
+        navigate('/')
+      } else {
+        navigate('/admin')
+      }
     } catch (error) {
-      message.error('Login failed. Please check your credentials.')
+      const errorMessage =
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (error as any).response?.data?.errors?.email?.msg || ''
+      message.error(errorMessage || 'Register failed. Please check your inputs.')
     }
   }
 

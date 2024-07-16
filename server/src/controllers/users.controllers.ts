@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
 import { ObjectId } from 'mongodb'
-import HTTP_STATUS from '~/constants/httpStatus'
 import { USERS_MESSAGES } from '~/constants/messages'
 import { LoginReqBody, RegisterReqBody, TokenPayload, VerifyEmailReqBody } from '~/models/requests/User.requests'
 import User from '~/models/schemas/User.schema'
@@ -12,9 +11,11 @@ export const loginController = async (req: Request<ParamsDictionary, any, LoginR
   const user = req.user as User
   const user_id = user._id as ObjectId
   const result = await usersService.login({ user_id: user_id.toString(), verify: user.verify })
+  const role = user.role
   return res.json({
     message: USERS_MESSAGES.LOGIN_SUCCESS,
-    result
+    result,
+    role
   })
 }
 export const registerController = async (
