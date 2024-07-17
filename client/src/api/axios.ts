@@ -5,10 +5,9 @@ import {
   isAxiosExpiredAccessTokenError,
   isAxiosUnauthorizedError,
   removeAuthFromCookie,
-  setAccessTokenToLocalCookie,
-
+  setAccessTokenToLocalCookie
 } from '../lib/utils'
-import { RefreshTokenResponse } from '../Types/reponses'
+import { RefreshTokenResponse } from '../types/reponses'
 
 class Request {
   instance: AxiosInstance
@@ -22,7 +21,7 @@ class Request {
     this.refreshTokenRequest = null
     this.instance = axios.create({
       baseURL: 'http://localhost:4000',
-      timeout: 5000
+      timeout: 10000
     })
 
     this.instance.interceptors.request.use(

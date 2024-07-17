@@ -1,7 +1,7 @@
 import styles from './style.module.scss'
 import pen from '../../assets/icons/pen.svg'
 import trash from '../../assets/icons/trash.svg'
-import { student } from '../../Types/student'
+import { student } from '../../types/student'
 
 type Props = {
   students: student[]

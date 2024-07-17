@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios'
 import Cookies from 'js-cookie'
 import HTTP_RESPONSE_STATUS_CODES from '../constants/httpStatus'
-import { ErrorResponse } from '../Types/reponses'
+import { ErrorResponse } from '../types/reponses'
 
 export const formatNumber = (number: number) => new Intl.NumberFormat().format(number)
 

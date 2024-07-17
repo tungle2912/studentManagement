@@ -2,7 +2,14 @@ import { NextFunction, Request, Response } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
 import { ObjectId } from 'mongodb'
 import { USERS_MESSAGES } from '~/constants/messages'
-import { LoginReqBody, RegisterReqBody, TokenPayload, VerifyEmailReqBody } from '~/models/requests/User.requests'
+import {
+  LoginReqBody,
+  RegisterReqBody,
+  requestOTPReqBody,
+  TokenPayload,
+  VerifyEmailReqBody,
+  verifyOTPAndResetPasswordReqBody
+} from '~/models/requests/User.requests'
 import User from '~/models/schemas/User.schema'
 import databaseService from '~/services/database.services'
 import usersService from '~/services/users.services'
@@ -38,48 +45,71 @@ export const verifyEmailController = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { user_id } = req.decoded_email_verify_token as TokenPayload
-  const user = await databaseService.users.findOne({
-    _id: new ObjectId(user_id)
-  })
-  // nếu không tìm thấy user sẽ báo lỗi
-  // if (!user) {
-  //   return res.status(HTTP_STATUS.NOT_FOUND).json({
-  //     message: USERS_MESSAGES.USER_NOT_FOUND
-  //   })
-  // }
-  // // đã verify rồi thì không báo lỗi
-  // // mà mình sẽ trả về status ok với message là đã verify rồi
-  // if (user.email_verify_token === '') {
-  //   return res.json({ message: USERS_MESSAGES.EMAIL_ALREADY_VERIFIED_BEFORE })
-  // }
+  try {
+    const { user_id, exp } = req.decoded_email_verify_token as TokenPayload
+    console.log(user_id, exp)
+    const user = await databaseService.users.findOne({
+      _id: new ObjectId(user_id)
+    })
+    let message
+    let redirectUrl = `http://localhost:3000/login`
+    if (!user) {
+      message = USERS_MESSAGES.USER_NOT_FOUND
+    } else {
+      const currentTime = Math.floor(Date.now() / 1000)
+      if (exp < currentTime) {
+        // Token đã hết hạn
+        await databaseService.users.deleteOne({
+          _id: new ObjectId(user_id)
+        })
+        message = USERS_MESSAGES.EMAIL_VERIFY_TOKEN_EXPIRED
+      } else if (user.email_verify_token === '') {
+        message = USERS_MESSAGES.EMAIL_ALREADY_VERIFIED_BEFORE
+      } else {
+        await usersService.verifyEmail(user_id)
+        message = USERS_MESSAGES.EMAIL_VERIFY_SUCCESS
+        redirectUrl = `http://localhost:3000/login?email=${encodeURIComponent(user.email)}`
+      }
+    }
 
-  // const result = await usersService.verifyEmail(user_id)
-  // return res.json({
-  //   message: USERS_MESSAGES.EMAIL_VERIFY_SUCCESS,
-  //   result
-  // })
-  let message
-  let redirectUrl = `http://localhost:3000/login`
-  if (!user) {
-    message = USERS_MESSAGES.USER_NOT_FOUND
-  } else if (user.email_verify_token === '') {
-    message = USERS_MESSAGES.EMAIL_ALREADY_VERIFIED_BEFORE
-  } else {
-    await usersService.verifyEmail(user_id)
-    message = USERS_MESSAGES.EMAIL_VERIFY_SUCCESS
-    redirectUrl = `http://localhost:3000/login?email=${encodeURIComponent(user.email)}`
+    res.send(`
+      <html>
+        <body>
+          <h2>${message}</h2>
+          <script>
+            setTimeout(() => {
+              window.location.href = '${redirectUrl}';
+            }, 3000); // Chuyển hướng sau 3 giây
+          </script>
+        </body>
+      </html>
+    `)
+  } catch (error) {
+    next(error)
   }
-  res.send(`
-    <html>
-      <body>
-        <h2>${message}</h2>
-        <script>
-          setTimeout(() => {
-            window.location.href = '${redirectUrl}';
-          }, 3000); // Chuyển hướng sau 3 giây
-        </script>
-      </body>
-    </html>
-  `)
+}
+export const forgotPasswordController = {
+  requestOTP: async (req: Request<ParamsDictionary, any, requestOTPReqBody>, res: Response, next: NextFunction) => {
+    try {
+      const user = req.user as User
+      const user_id = user._id as ObjectId
+      await usersService.forgotPasswordService({ user_id: user_id.toString(), email: user.email })
+      res.status(200).json({ message: 'OTP sent to your email.' })
+    } catch (error) {
+      next(error)
+    }
+  },
+  verifyOTPAndResetPassword: async (
+    req: Request<ParamsDictionary, any, verifyOTPAndResetPasswordReqBody>,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { email, password, otp } = req.body
+      const result = await usersService.verifyOTPAndResetPassword({ email, password, otp })
+      res.status(200).json({ message: 'Password reset successfully.' })
+    } catch (error) {
+      next(error)
+    }
+  }
 }

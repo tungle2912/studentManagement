@@ -1,11 +1,8 @@
-export const publicRoutes = {
-  adminLogin: '/admin/login',
-  home: '/',
-  login: '/login',
-  register: '/register'
+export const publicAdminRoutes = {
+  login: '/admin/login'
 } as const
 
-export const privateRoutes = {
+export const privateAdminRoutes = {
   home: '/admin/',
   dashboard: '/admin/dashboard',
   payment: '/admin/payment',

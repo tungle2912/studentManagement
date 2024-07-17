@@ -1,4 +1,8 @@
+import { Request } from 'express'
 import { checkSchema, ParamSchema } from 'express-validator'
+import { JsonWebTokenError } from 'jsonwebtoken'
+import { capitalize } from 'lodash'
+import { RoleType, UserVerifyStatus } from '~/constants/enums'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { USERS_MESSAGES } from '~/constants/messages'
 import { ErrorWithStatus } from '~/models/Errors'
@@ -6,12 +10,7 @@ import databaseService from '~/services/database.services'
 import usersService from '~/services/users.services'
 import { hashPassword } from '~/utils/crypto'
 import { verifyToken } from '~/utils/jwt'
-import { NextFunction, Response, Request } from 'express'
 import { validate } from '~/utils/validation'
-import { TokenPayload } from '~/models/requests/User.requests'
-import { capitalize } from 'lodash'
-import { JsonWebTokenError } from 'jsonwebtoken'
-import { RoleType } from '~/constants/enums'
 
 const passwordSchema: ParamSchema = {
   notEmpty: {
@@ -117,7 +116,8 @@ export const loginValidator = validate(
             const user = await databaseService.users.findOne({
               email: value,
               password: hashPassword(req.body.password),
-              role: RoleType.User
+              role: RoleType.User,
+              verify: UserVerifyStatus.Verified
             })
             if (user === null) {
               throw new Error(USERS_MESSAGES.EMAIL_OR_PASSWORD_IS_INCORRECT)
@@ -263,6 +263,79 @@ export const refreshTokenValidator = validate(
               }
               throw error
             }
+            return true
+          }
+        }
+      }
+    },
+    ['body']
+  )
+)
+export const forgotPasswordValidator = validate(
+  checkSchema(
+    {
+      email: {
+        trim: true,
+        isEmail: {
+          errorMessage: USERS_MESSAGES.EMAIL_IS_INVALID
+        },
+        custom: {
+          options: async (value, { req }) => {
+            const user = await databaseService.users.findOne({
+              email: value,
+              verify: 1
+            })
+            if (user === null) {
+              throw new Error(USERS_MESSAGES.USER_NOT_FOUND)
+            }
+            req.user = user
+            return true
+          }
+        }
+      }
+    },
+    ['body']
+  )
+)
+export const verifyForgotPasswordValidator = validate(
+  checkSchema(
+    {
+      email: {
+        trim: true,
+        isEmail: {
+          errorMessage: USERS_MESSAGES.EMAIL_IS_INVALID
+        },
+        custom: {
+          options: async (value, { req }) => {
+            const user = await databaseService.users.findOne({
+              email: value,
+              verify: 1
+            })
+            if (user === null) {
+              throw new Error(USERS_MESSAGES.USER_NOT_FOUND)
+            }
+            req.user = user
+            return true
+          }
+        }
+      },
+      password: passwordSchema,
+      otp: {
+        notEmpty: {
+          errorMessage: USERS_MESSAGES.OTP_IS_REQUIRED
+        },
+        isNumeric: {
+          errorMessage: USERS_MESSAGES.OTP_IS_NOT_NUMBER
+        },
+        custom: {
+          options: async (value, { req }) => {
+            const otp = await databaseService.otps.findOne({
+              otp: value
+            })
+            if (otp === null) {
+              throw new Error(USERS_MESSAGES.OTP_INVALID_OR_EXPIRED)
+            }
+            req.otp = otp
             return true
           }
         }

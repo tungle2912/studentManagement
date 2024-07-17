@@ -3,6 +3,7 @@ import 'dotenv/config'
 import User from '~/models/schemas/User.schema'
 import RefreshToken from '~/models/schemas/RefreshToken.chema'
 import { envConfig } from '~/constants/config'
+import Otps from '~/models/schemas/otps.chema'
 
 const uri = `mongodb+srv://${envConfig.dbUsername}:${envConfig.dbPassword}@studentmanagement.bygjalp.mongodb.net/`
 
@@ -51,6 +52,10 @@ class DatabaseService {
   get refreshTokens(): Collection<RefreshToken> {
     return this.db.collection('refresh_token')
   }
+  get otps(): Collection<Otps> {
+    return this.db.collection('otps')
+  }
+
 
 }
 

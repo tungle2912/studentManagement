@@ -4,6 +4,7 @@ import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import Tittle from '../../../common/Tittle'
 import styles from './style.module.scss'
 import { setAccessTokenToLocalCookie, setRefreshTokenToCookie } from '../../../lib/utils'
+import { RoleType } from '../../../constants/enums'
 
 function Login() {
   const [form] = Form.useForm()
@@ -26,15 +27,14 @@ function Login() {
       setRefreshTokenToCookie(refresh_token)
       message.success('Login successful!')
       const role = response.data.role
-      if (role == 1) {
+      if (role == RoleType.User) {
         navigate('/')
       } else {
         navigate('/admin')
       }
-    } catch (error) {
-      const errorMessage =
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (error as any).response?.data?.errors?.email?.msg || ''
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.errors?.email?.msg || ''
       message.error(errorMessage || 'Register failed. Please check your inputs.')
     }
   }
@@ -104,7 +104,7 @@ function Login() {
             </Button>
           </Form.Item>
         </Form>
-        <p className={styles.loginFormContentDescription}>
+        <div className={styles.loginFormContentDescription}>
           Forgot your password?
           {isAdminLogin ? (
             <NavLink to='/resetpassword' className={styles.loginFormContentReset}>
@@ -115,7 +115,7 @@ function Login() {
               Register
             </NavLink>
           )}
-        </p>
+        </div>
       </div>
     </div>
   )

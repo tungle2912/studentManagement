@@ -1,21 +1,22 @@
 import './App.css'
 import { useRoutes } from 'react-router-dom'
-import { publicRoutes, privateRoutes } from './pages/routes'
+import { publicAdminRoutes, privateAdminRoutes } from './config/admin.routes'
+import { publicUserRoutes } from './config/users.routes'
 import MainLayout from './layouts/MainLayout'
 import AuthLayout from './layouts/AuthLayout'
-import Login from './pages/Admin/Login'
-import Home from './pages/Admin/Home'
-import Payment from './pages/Admin/Payment'
-import Students from './pages/Admin/Students'
-import Settings from './pages/Admin/Settings'
-import Report from './pages/Admin/Report'
-import Course from './pages/Admin/Course'
-import Register from './pages/Admin/Register'
+import Login from './pages/Admin/login'
+import Home from './pages/Admin/home'
+import Payment from './pages/Admin/payment'
+import Students from './pages/Admin/students'
+import Settings from './pages/Admin/settings'
+import Report from './pages/Admin/report'
+import Course from './pages/Admin/course'
+import Register from './pages/Admin/register'
 
 function App() {
   const elements = useRoutes([
     {
-      path: publicRoutes.login, // /login
+      path: publicUserRoutes.login, // /login
       element: (
         <AuthLayout>
           <Login />
@@ -23,7 +24,7 @@ function App() {
       )
     },
     {
-      path: publicRoutes.adminLogin, // /login
+      path: publicAdminRoutes.login, // /login
       element: (
         <AuthLayout>
           <Login />
@@ -31,7 +32,7 @@ function App() {
       )
     },
     {
-      path: publicRoutes.register,
+      path: publicUserRoutes.register,
       element: (
         <AuthLayout>
           <Register />
@@ -39,7 +40,7 @@ function App() {
       )
     },
     {
-      path: privateRoutes.home,
+      path: privateAdminRoutes.home,
       element: (
         <MainLayout>
           <Home />
@@ -47,7 +48,7 @@ function App() {
       )
     },
     {
-      path: privateRoutes.payment,
+      path: privateAdminRoutes.payment,
       element: (
         <MainLayout>
           <Payment />
@@ -55,7 +56,7 @@ function App() {
       )
     },
     {
-      path: privateRoutes.course,
+      path: privateAdminRoutes.course,
       element: (
         <MainLayout>
           <Course />
@@ -63,7 +64,7 @@ function App() {
       )
     },
     {
-      path: privateRoutes.report,
+      path: privateAdminRoutes.report,
       element: (
         <MainLayout>
           <Report />
@@ -71,7 +72,7 @@ function App() {
       )
     },
     {
-      path: privateRoutes.students,
+      path: privateAdminRoutes.students,
       element: (
         <MainLayout>
           <Students />
@@ -79,7 +80,7 @@ function App() {
       )
     },
     {
-      path: privateRoutes.settings,
+      path: privateAdminRoutes.settings,
       element: (
         <MainLayout>
           <Settings />

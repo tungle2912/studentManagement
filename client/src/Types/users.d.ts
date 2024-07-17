@@ -12,4 +12,5 @@ export interface user {
   username?: string
   avatar?: string
   cover_photo?: string
+  role?: RoleType
 }

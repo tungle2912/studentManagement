@@ -1,6 +1,18 @@
 import { Router } from 'express'
-import { loginController, registerController, verifyEmailController } from '~/controllers/users.controllers'
-import { adminLoginValidator, emailVerifyTokenValidator, loginValidator, registerValidator } from '~/middlewares/users.middlewares'
+import {
+  forgotPasswordController,
+  loginController,
+  registerController,
+  verifyEmailController
+} from '~/controllers/users.controllers'
+import {
+  adminLoginValidator,
+  emailVerifyTokenValidator,
+  forgotPasswordValidator,
+  loginValidator,
+  registerValidator,
+  verifyForgotPasswordValidator
+} from '~/middlewares/users.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
 export const usersRouter = Router()
 
@@ -27,3 +39,23 @@ usersRouter.post('/login', loginValidator, wrapRequestHandler(loginController))
  * body: { email_verify_token: string }
  */
 usersRouter.get('/verify-email', emailVerifyTokenValidator, wrapRequestHandler(verifyEmailController))
+
+/**
+ * Description.submid email to reset password, sen email to user
+ * Path: /forgot-password
+ * Method: POST
+ * body: {email: string}
+ */
+usersRouter.post('/forgot-password', forgotPasswordValidator, wrapRequestHandler(forgotPasswordController.requestOTP))
+
+/**
+ * Description.submid email to reset password, sen email to user
+ * Path: /verify-forgot-password
+ * Method: POST
+ * body: {email: string}
+ */
+usersRouter.post(
+  '/verify-forgot-password',
+  verifyForgotPasswordValidator,
+  wrapRequestHandler(forgotPasswordController.verifyOTPAndResetPassword)
+)

@@ -1,5 +1,5 @@
 import avt from '../assets/images'
-import { student } from '../Types/student'
+import { student } from '../types/student'
 
 const listStudents: student[] = [
   {

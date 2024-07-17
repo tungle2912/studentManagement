@@ -1,4 +1,4 @@
-import { payment } from '../../Types/payment'
+import { payment } from '../../types/payment'
 import styles from './style.module.scss'
 import eye from '../../assets/icons/eye.svg'
 type Props = {
