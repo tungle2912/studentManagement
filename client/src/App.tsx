@@ -12,6 +12,7 @@ import Settings from './pages/Admin/settings'
 import Report from './pages/Admin/report'
 import Course from './pages/Admin/course'
 import Register from './pages/Admin/register'
+import Forgotpassword from './pages/Admin/forgotpassword'
 
 function App() {
   const elements = useRoutes([
@@ -36,6 +37,14 @@ function App() {
       element: (
         <AuthLayout>
           <Register />
+        </AuthLayout>
+      )
+    },
+    {
+      path: publicUserRoutes.forgotpassword,
+      element: (
+        <AuthLayout>
+          <Forgotpassword />
         </AuthLayout>
       )
     },

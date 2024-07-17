@@ -38,6 +38,7 @@ export const USERS_MESSAGES = {
   PASSWORD_RESET_SUCCESS: 'Password reset success',
   OTP_INVALID_OR_EXPIRED: 'OTP invalid or expired',
   OTP_IS_REQUIRED: 'OTP is required',
+  OTP_IS_WRONG: 'OTP is wrong',
   OTP_IS_NOT_NUMBER: 'OTP is not number',
   VERIFY_FORGOT_PASSWORD_SUCCESS: 'Verify forgot password success',
   INVALID_FORGOT_PASSWORD_TOKEN: 'Invalid forgot password token',

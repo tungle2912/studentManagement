@@ -5,10 +5,10 @@ interface UserType {
   _id?: ObjectId
   name: string
   email: string
-  date_of_birth?: Date
+  date_of_birth?: number
   password: string
-  created_at?: Date
-  updated_at?: Date
+  created_at?: number
+  updated_at?: number
   email_verify_token?: string
   forgot_password_token?: string
   verify?: UserVerifyStatus
@@ -22,10 +22,10 @@ export default class User {
   _id?: ObjectId
   name: string
   email: string
-  date_of_birth: Date
+  date_of_birth: number
   password: string
-  created_at: Date
-  updated_at: Date
+  created_at: number
+  updated_at: number
   email_verify_token: string // jwt hoặc '' nếu đã xác thực email
   forgot_password_token: string // jwt hoặc '' nếu đã xác thực email
   verify: UserVerifyStatus
@@ -35,11 +35,11 @@ export default class User {
   role: RoleType
 
   constructor(user: UserType) {
-    const date = new Date()
+    const date = Date.now()
     this._id = user._id
     this.name = user.name || ''
     this.email = user.email
-    this.date_of_birth = user.date_of_birth || new Date()
+    this.date_of_birth = user.date_of_birth || date
     this.password = user.password
     this.created_at = user.created_at || date
     this.updated_at = user.updated_at || date

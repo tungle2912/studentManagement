@@ -6,12 +6,12 @@ import {
   verifyEmailController
 } from '~/controllers/users.controllers'
 import {
-  adminLoginValidator,
   emailVerifyTokenValidator,
-  forgotPasswordValidator,
   loginValidator,
   registerValidator,
-  verifyForgotPasswordValidator
+  resetPasswordValidator,
+  sendOtpForgotPasswordValidator,
+  verifyOtpForgotPasswordValidator
 } from '~/middlewares/users.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
 export const usersRouter = Router()
@@ -42,20 +42,32 @@ usersRouter.get('/verify-email', emailVerifyTokenValidator, wrapRequestHandler(v
 
 /**
  * Description.submid email to reset password, sen email to user
- * Path: /forgot-password
- * Method: POST
- * body: {email: string}
- */
-usersRouter.post('/forgot-password', forgotPasswordValidator, wrapRequestHandler(forgotPasswordController.requestOTP))
-
-/**
- * Description.submid email to reset password, sen email to user
- * Path: /verify-forgot-password
+ * Path: /send-otp-forgot-password
  * Method: POST
  * body: {email: string}
  */
 usersRouter.post(
-  '/verify-forgot-password',
-  verifyForgotPasswordValidator,
-  wrapRequestHandler(forgotPasswordController.verifyOTPAndResetPassword)
+  '/send-otp-forgot-password',
+  sendOtpForgotPasswordValidator,
+  wrapRequestHandler(forgotPasswordController.requestOTP)
 )
+
+/**
+ * Description.submid email to reset password, sen email to user
+ * Path: /verify-otp-forgot-password
+ * Method: POST
+ * body: {email: string}
+ */
+usersRouter.post(
+  '/verify-otp-forgot-password',
+  verifyOtpForgotPasswordValidator,
+  wrapRequestHandler(forgotPasswordController.verifyOTP)
+)
+
+/**
+ * Description.submid email to reset password, sen email to user
+ * Path: /reset-password
+ * Method: POST
+ * body: {email: string}
+ */
+usersRouter.put('/reset-password', resetPasswordValidator, wrapRequestHandler(forgotPasswordController.resetPassword))

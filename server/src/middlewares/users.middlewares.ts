@@ -2,7 +2,8 @@ import { Request } from 'express'
 import { checkSchema, ParamSchema } from 'express-validator'
 import { JsonWebTokenError } from 'jsonwebtoken'
 import { capitalize } from 'lodash'
-import { RoleType, UserVerifyStatus } from '~/constants/enums'
+import { ObjectId } from 'mongodb'
+import { ForgotPasswordVerifyStatus, RoleType, UserVerifyStatus } from '~/constants/enums'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { USERS_MESSAGES } from '~/constants/messages'
 import { ErrorWithStatus } from '~/models/Errors'
@@ -271,7 +272,7 @@ export const refreshTokenValidator = validate(
     ['body']
   )
 )
-export const forgotPasswordValidator = validate(
+export const sendOtpForgotPasswordValidator = validate(
   checkSchema(
     {
       email: {
@@ -288,7 +289,6 @@ export const forgotPasswordValidator = validate(
             if (user === null) {
               throw new Error(USERS_MESSAGES.USER_NOT_FOUND)
             }
-            req.user = user
             return true
           }
         }
@@ -297,7 +297,38 @@ export const forgotPasswordValidator = validate(
     ['body']
   )
 )
-export const verifyForgotPasswordValidator = validate(
+export const verifyOtpForgotPasswordValidator = validate(
+  checkSchema(
+    {
+      otp: {
+        notEmpty: {
+          errorMessage: USERS_MESSAGES.OTP_IS_REQUIRED
+        },
+        isNumeric: {
+          errorMessage: USERS_MESSAGES.OTP_IS_NOT_NUMBER
+        },
+        custom: {
+          options: async (value, { req }) => {
+            const otp_id = new ObjectId(req.body?.otp_id as string)
+            const otp = await databaseService.otps.findOne({
+              _id: otp_id,
+              otp: value
+            })
+            if (!otp) {
+              throw new Error(USERS_MESSAGES.OTP_IS_WRONG)
+            }
+            if (otp.expires_at && otp.expires_at < Date.now()) {
+              throw new Error(USERS_MESSAGES.OTP_INVALID_OR_EXPIRED)
+            }
+            return true
+          }
+        }
+      }
+    },
+    ['body']
+  )
+)
+export const resetPasswordValidator = validate(
   checkSchema(
     {
       email: {
@@ -309,7 +340,8 @@ export const verifyForgotPasswordValidator = validate(
           options: async (value, { req }) => {
             const user = await databaseService.users.findOne({
               email: value,
-              verify: 1
+              verify: 1,
+              role: RoleType.User
             })
             if (user === null) {
               throw new Error(USERS_MESSAGES.USER_NOT_FOUND)
@@ -320,22 +352,17 @@ export const verifyForgotPasswordValidator = validate(
         }
       },
       password: passwordSchema,
-      otp: {
-        notEmpty: {
-          errorMessage: USERS_MESSAGES.OTP_IS_REQUIRED
-        },
-        isNumeric: {
-          errorMessage: USERS_MESSAGES.OTP_IS_NOT_NUMBER
-        },
+      confirm_password: confirmPasswordSchema,
+      otp_id: {
         custom: {
           options: async (value, { req }) => {
             const otp = await databaseService.otps.findOne({
-              otp: value
+              _id: new ObjectId(value as string),
+              status: ForgotPasswordVerifyStatus.Verified
             })
-            if (otp === null) {
+            if (!otp) {
               throw new Error(USERS_MESSAGES.OTP_INVALID_OR_EXPIRED)
             }
-            req.otp = otp
             return true
           }
         }

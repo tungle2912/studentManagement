@@ -55,6 +55,8 @@ function Login() {
         </div>
         <Form
           className={styles.loginFormContent}
+          layout='vertical'
+          requiredMark={false}
           name='normal_login'
           form={form}
           initialValues={{
@@ -63,8 +65,8 @@ function Login() {
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
         >
-          <label>Email</label>
           <Form.Item
+          label='Email'
             className={styles.loginFormInput}
             name='email'
             rules={[
@@ -80,9 +82,9 @@ function Login() {
             ]}
           >
             <Input placeholder='Enter your email' autoComplete='email' />
-          </Form.Item>
-          <label>Password</label>
+          </Form.Item>        
           <Form.Item
+          label='Password'
             className={styles.loginFormInput}
             name='password'
             rules={[

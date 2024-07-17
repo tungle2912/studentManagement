@@ -1,14 +1,15 @@
-import { RegisterReqBody } from '~/models/requests/User.requests'
-import databaseService from './database.services'
 import { ObjectId } from 'mongodb'
-import { signToken, verifyToken } from '~/utils/jwt'
-import { TokenType, UserVerifyStatus } from '~/constants/enums'
+import nodemailer from 'nodemailer'
+import { envConfig } from '~/constants/config'
+import { ForgotPasswordVerifyStatus, TokenType, UserVerifyStatus } from '~/constants/enums'
+import { USERS_MESSAGES } from '~/constants/messages'
+import { RegisterReqBody } from '~/models/requests/User.requests'
+import Otps from '~/models/schemas/otps.chema'
+import RefreshToken from '~/models/schemas/RefreshToken.chema'
 import User from '~/models/schemas/User.schema'
 import { hashPassword } from '~/utils/crypto'
-import { envConfig } from '~/constants/config'
-import nodemailer from 'nodemailer'
-import RefreshToken from '~/models/schemas/RefreshToken.chema'
-import { USERS_MESSAGES } from '~/constants/messages'
+import { signToken, verifyToken } from '~/utils/jwt'
+import databaseService from './database.services'
 
 class UsersService {
   private signAccessToken({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
@@ -269,50 +270,63 @@ class UsersService {
     }
   }
   private generateOtp = () => {
-    return Math.floor(100000 + Math.random() * 900000).toString()
+    return Math.floor(100000 + Math.random() * 900000)
   }
-  async saveOtpDatabase(user_id: string, otp: string) {
-    const created_at = new Date()
+  async saveOtpDatabase(email: string, otp: string) {
     const _id = new ObjectId()
-    const userId = new ObjectId(user_id)
-    const expires_at = new Date(created_at.getTime() + 60 * 1000) // 60 giây
-    await databaseService.otps.insertOne({
-      _id,
-      user_id: userId,
-      otp,
-      expires_at,
-      created_at
-    })
+    const user = await databaseService.users.findOne({ email: email })
+    const userId = new ObjectId(user?._id)
+    await Promise.all([
+      databaseService.otps.deleteMany({ user_id: userId }),
+      databaseService.otps.insertOne(
+        new Otps({
+          _id,
+          user_id: userId,
+          otp
+        })
+      )
+    ])
+    return _id
   }
-  async forgotPasswordService({ user_id, email }: { user_id: string; email: string }) {
-    const otp = this.generateOtp()
-    await this.sendOTPEmail(email, otp)
-    await this.saveOtpDatabase(user_id, otp)
+  async forgotPasswordService(email: string) {
+    const otp = this.generateOtp().toString()
+    const [otp_id] = await Promise.all([this.saveOtpDatabase(email, otp), this.sendOTPEmail(email, otp)])
+    return otp_id
   }
-  async verifyOTPAndResetPassword({ email, password, otp }: { email: string; password: string; otp: string }) {
+  async verifyOtp(otp_id: string) {
+    try {
+      await databaseService.otps.updateOne(
+        {
+          _id: new ObjectId(otp_id)
+        },
+        [
+          {
+            $set: {
+              status: ForgotPasswordVerifyStatus.Verified,
+              updated_at: '$$NOW'
+            }
+          }
+        ]
+      )
+    } catch (error) {
+      console.error('Error during verifyOTPAndResetPassword:', error)
+      throw new Error('An error occurred during verify OTP and reset password. Please try again later.')
+    }
+  }
+  async resetPassword({ email, password, otp_id }: { email: string; password: string; otp_id: string }) {
     try {
       const user = await databaseService.users.findOne({ email })
       if (!user) {
         throw new Error(USERS_MESSAGES.USER_NOT_FOUND)
       }
-      const otpRecord = await databaseService.otps.findOne({
-        user_id: user._id,
-        otp
-      })
-      if (!otpRecord || otpRecord.expires_at < new Date()) {
-        throw new Error(USERS_MESSAGES.OTP_INVALID_OR_EXPIRED)
-      }
       await databaseService.users.updateOne(
         { _id: user._id }, // Sử dụng _id để tìm kiếm người dùng
         {
-          $set: { password: hashPassword(password) },
-          $currentDate: {
-            updated_at: true //
-          }
+          $set: { password: hashPassword(password), updated_at: Date.now() }
         }
       )
       // Xóa bản ghi OTP
-      await databaseService.otps.deleteOne({ _id: otpRecord._id })
+      await databaseService.otps.deleteOne({ _id: new ObjectId(otp_id) })
       return {
         message: USERS_MESSAGES.PASSWORD_RESET_SUCCESS
       }

@@ -37,13 +37,11 @@ function Register() {
       setLoading(false) // Ẩn loading sau khi hoàn thành
     }
   }
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onFinishFailed = (errorInfo: any) => {
     console.log('Failed:', errorInfo)
     message.error('Register failed. Please check your inputs.')
   }
-
   return (
     <div className={styles.loginContainer}>
       <div className={styles.loginForm}>
@@ -52,6 +50,8 @@ function Register() {
           <span className={styles.loginSignIn}>REGISTER</span>
         </div>
         <Form
+          layout='vertical'
+          requiredMark={false}
           className={styles.loginFormContent}
           name='normal_login'
           form={form}
@@ -61,8 +61,8 @@ function Register() {
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
         >
-          <label>Email</label>
           <Form.Item
+            label='Email'
             className={styles.loginFormInput}
             name='email'
             rules={[
@@ -79,8 +79,8 @@ function Register() {
           >
             <Input placeholder='Enter your email' autoComplete='email' />
           </Form.Item>
-          <label>Password</label>
           <Form.Item
+            label='Password'
             className={styles.loginFormInput}
             name='password'
             rules={[
@@ -96,8 +96,8 @@ function Register() {
           >
             <Input type='password' placeholder='Enter your password' autoComplete='new-password' />
           </Form.Item>
-          <label>Confirm Password</label>
           <Form.Item
+            label='Confirm Password'
             className={styles.loginFormInput}
             name='confirm_password'
             dependencies={['password']}

@@ -6,9 +6,10 @@ import {
   LoginReqBody,
   RegisterReqBody,
   requestOTPReqBody,
+  ResetPasswordReqBody,
   TokenPayload,
   VerifyEmailReqBody,
-  verifyOTPAndResetPasswordReqBody
+  verifyOTPReqBody
 } from '~/models/requests/User.requests'
 import User from '~/models/schemas/User.schema'
 import databaseService from '~/services/database.services'
@@ -91,23 +92,31 @@ export const verifyEmailController = async (
 export const forgotPasswordController = {
   requestOTP: async (req: Request<ParamsDictionary, any, requestOTPReqBody>, res: Response, next: NextFunction) => {
     try {
-      const user = req.user as User
-      const user_id = user._id as ObjectId
-      await usersService.forgotPasswordService({ user_id: user_id.toString(), email: user.email })
-      res.status(200).json({ message: 'OTP sent to your email.' })
+      const email = req.body.email
+      const result = await usersService.forgotPasswordService(email)
+      res.status(200).json({ message: 'OTP sent to your email.', result })
     } catch (error) {
       next(error)
     }
   },
-  verifyOTPAndResetPassword: async (
-    req: Request<ParamsDictionary, any, verifyOTPAndResetPasswordReqBody>,
+  verifyOTP: async (req: Request<ParamsDictionary, any, verifyOTPReqBody>, res: Response, next: NextFunction) => {
+    try {
+      const otp_id = req.body.otp_id as string
+      await usersService.verifyOtp(otp_id)
+      res.status(200).json({ message: 'verify OTP success' })
+    } catch (error) {
+      next(error)
+    }
+  },
+  resetPassword: async (
+    req: Request<ParamsDictionary, any, ResetPasswordReqBody>,
     res: Response,
     next: NextFunction
   ) => {
     try {
-      const { email, password, otp } = req.body
-      const result = await usersService.verifyOTPAndResetPassword({ email, password, otp })
-      res.status(200).json({ message: 'Password reset successfully.' })
+      const { email, password, otp_id } = req.body
+      const result = await usersService.resetPassword({ email, password, otp_id })
+      res.status(200).json({ result })
     } catch (error) {
       next(error)
     }

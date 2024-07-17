@@ -75,10 +75,13 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 415px;
+  max-width: 360px;
   margin-bottom: 20px;
   margin-top: 10px;
- 
+  
+}
+.inputPassword input{
+  height: 44px;
 }
 .loginFormInput p {
   margin-bottom: 10px;
@@ -90,14 +93,26 @@
   padding: 0;
 }
 .loginFormButton{
-  margin-top: 10px;
+  margin-top: 20px;
   width: 100%;
   height: 44px;
   background-color: #FEAF00;
   font-weight: 400;
   font-size: 14px;
 }
+.inputEmail{
+  display: flex;
+}
+.buttonSendOtp{
+  width: 44px!important;
+  height: 44px;
+  margin-top: 40px;
+  margin-left: 10px;
+}
 
+.inputOtp{
+  margin-bottom: 10px !important;
+}
 @media (max-width: 739px) {
   .loginContainer {
     .loginForm {
@@ -124,6 +139,7 @@
     }
   }
 }
+
 @media (min-width: 739px) and (max-width: 1023px) {
   .loginContainer {
     .loginForm {
