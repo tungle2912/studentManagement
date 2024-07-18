@@ -133,34 +133,6 @@ export const loginValidator = validate(
     ['body']
   )
 )
-export const adminLoginValidator = validate(
-  checkSchema(
-    {
-      email: {
-        isEmail: {
-          errorMessage: USERS_MESSAGES.EMAIL_IS_INVALID
-        },
-        trim: true,
-        custom: {
-          options: async (value, { req }) => {
-            const user = await databaseService.users.findOne({
-              email: value,
-              password: hashPassword(req.body.password),
-              role: RoleType.Admin
-            })
-            if (user === null) {
-              throw new Error(USERS_MESSAGES.EMAIL_OR_PASSWORD_IS_INCORRECT)
-            }
-            req.user = user
-            return true
-          }
-        }
-      },
-      password: passwordSchema
-    },
-    ['body']
-  )
-)
 export const emailVerifyTokenValidator = validate(
   checkSchema(
     {
@@ -287,7 +259,7 @@ export const sendOtpForgotPasswordValidator = validate(
               verify: 1
             })
             if (user === null) {
-              throw new Error(USERS_MESSAGES.USER_NOT_FOUND)
+              throw new Error(USERS_MESSAGES.EMAIL_NOT_FOUND)
             }
             return true
           }

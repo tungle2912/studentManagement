@@ -32,10 +32,9 @@ export const registerController = async (
   next: NextFunction
 ) => {
   try {
-    const result = await usersService.register(req.body)
+    await usersService.register(req.body)
     return res.json({
-      message: USERS_MESSAGES.REGISTER_SUCCESS,
-      result
+      message: USERS_MESSAGES.REGISTER_SUCCESS
     })
   } catch (error) {
     next(error)
@@ -116,7 +115,7 @@ export const forgotPasswordController = {
     try {
       const { email, password, otp_id } = req.body
       const result = await usersService.resetPassword({ email, password, otp_id })
-      res.status(200).json({ result })
+      res.status(200).json({ message: USERS_MESSAGES.RESET_PASSWORD_SUCCESS })
     } catch (error) {
       next(error)
     }

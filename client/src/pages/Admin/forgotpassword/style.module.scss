@@ -54,10 +54,9 @@
       padding-top: 30px;
       display: flex;
       flex-direction: column;
-    
+      align-items: center;
     }
   }
-  
 }
 .loginFormContentDescription {
   font-weight: 400;
@@ -78,40 +77,47 @@
   max-width: 360px;
   margin-bottom: 20px;
   margin-top: 10px;
-  
 }
-.inputPassword input{
+.inputPassword input {
   height: 44px;
+  width: 100%;
 }
 .loginFormInput p {
   margin-bottom: 10px;
 }
-.loginFormInput input{
+.loginFormInput input {
   height: 44px;
 }
 .loginFormInput span {
   padding: 0;
 }
-.loginFormButton{
-  margin-top: 20px;
+.buttonResetPassword{
+  width: 100%;
+}
+.loginFormButton {
+  margin-top: 10px;
   width: 100%;
   height: 44px;
-  background-color: #FEAF00;
+  background-color: #feaf00;
   font-weight: 400;
   font-size: 14px;
 }
-.inputEmail{
+.inputEmail {
   display: flex;
+  width: 100%;
 }
-.buttonSendOtp{
-  width: 44px!important;
+.buttonSendOtp {
+  width: 55px !important;
   height: 44px;
-  margin-top: 40px;
+  margin-top: 31px;
   margin-left: 10px;
 }
 
-.inputOtp{
-  margin-bottom: 10px !important;
+
+:global(.input-otp .ant-input) {
+  width: 50px;
+  height: 55px;
+  margin-top: 10px;
 }
 @media (max-width: 739px) {
   .loginContainer {

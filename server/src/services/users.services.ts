@@ -1,5 +1,4 @@
 import { ObjectId } from 'mongodb'
-import nodemailer from 'nodemailer'
 import { envConfig } from '~/constants/config'
 import { ForgotPasswordVerifyStatus, TokenType, UserVerifyStatus } from '~/constants/enums'
 import { USERS_MESSAGES } from '~/constants/messages'
@@ -10,6 +9,7 @@ import User from '~/models/schemas/User.schema'
 import { hashPassword } from '~/utils/crypto'
 import { signToken, verifyToken } from '~/utils/jwt'
 import databaseService from './database.services'
+import mailService from './mail.services'
 
 class UsersService {
   private signAccessToken({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
@@ -84,155 +84,31 @@ class UsersService {
       secretOrPublicKey: envConfig.jwtSecretRefreshToken
     })
   }
-  async sendVerificationEmail(userEmail: string, emailVerifyToken: string) {
-    const transporter = nodemailer.createTransport({
-      service: 'Gmail',
-      auth: {
-        user: envConfig.emailUsername,
-        pass: envConfig.emailPassword
-      },
-      tls: {
-        rejectUnauthorized: false
-      }
-    })
-
-    const verificationLink = `http://localhost:4000/users/verify-email?token=${emailVerifyToken}`
-
-    const mailOptions = {
-      from: envConfig.emailUsername,
-      to: 'tung291203@gmail.com',
-      subject: 'Email Verification',
-      html: `<p>Please click the link below to verify your email:</p><a href="${verificationLink}">Verify Email</a>`
-    }
-
-    await transporter.sendMail(mailOptions)
-  }
-  async sendOTPEmail(userEmail: string, otp: string) {
-    const transporter = nodemailer.createTransport({
-      service: 'Gmail',
-      auth: {
-        user: envConfig.emailUsername,
-        pass: envConfig.emailPassword
-      },
-      tls: {
-        rejectUnauthorized: false
-      }
-    })
-    const mailOptions = {
-      from: envConfig.emailUsername,
-      to: 'tung291203@gmail.com',
-      subject: 'ForgotPassword Verification',
-      html: `<!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>Email Verification Code</title>
-                    <style>
-                        body {
-                            font-family: Arial, sans-serif;
-                            margin: 0;
-                            padding: 0;
-                            background-color: #f4f4f4;
-                        }
-                        .container {
-                            max-width: 600px;
-                            margin: 0 auto;
-                            padding: 20px;
-                            background-color: #ffffff;
-                            border-radius: 8px;
-                            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                        }
-                        .header {
-                            text-align: center;
-                            padding: 10px 0;
-                            border-bottom: 1px solid #dddddd;
-                        }
-                        .header h1 {
-                            margin: 0;
-                            font-size: 24px;
-                            color: #333333;
-                        }
-                        .content {
-                            padding: 20px;
-                            text-align: center;
-                        }
-                        .content p {
-                            font-size: 18px;
-                            color: #666666;
-                        }
-                        .otp {
-                            display: inline-block;
-                            margin: 20px 0;
-                            padding: 10px 20px;
-                            font-size: 24px;
-                            font-weight: bold;
-                            color: #ffffff;
-                            background-color: #007BFF;
-                            border-radius: 4px;
-                            text-decoration: none;
-                        }
-                        .footer {
-                            text-align: center;
-                            padding: 10px 0;
-                            border-top: 1px solid #dddddd;
-                            font-size: 14px;
-                            color: #999999;
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                        <div class="header">
-                            <h1>Email Verification</h1>
-                        </div>
-                        <div class="content">
-                            <p>Hello,</p>
-                            <p>Your want to reset your password. Please use the following One Time Password (OTP) to complete your verification process:</p>
-                            <div class="otp">${otp}</div>
-<p>This OTP is valid for 120s.</p>
-                        </div>
-                        <div class="footer">
-                            <p>If you did not request this code, please ignore this email.</p>
-                            <p>Thank you,<br>Your Company Name</p>
-                        </div>
-                    </div>
-                </body>
-                </html>`
-    }
-
-    await transporter.sendMail(mailOptions)
-  }
   async register(payload: RegisterReqBody) {
-    try {
-      const user_id = new ObjectId()
-      const email_verify_token = await this.signEmailVerifyToken({
-        user_id: user_id.toString(),
-        verify: UserVerifyStatus.Unverified
+    const user_id = new ObjectId()
+    const email_verify_token = await this.signEmailVerifyToken({
+      user_id: user_id.toString(),
+      verify: UserVerifyStatus.Unverified
+    })
+    await databaseService.users.insertOne(
+      new User({
+        ...payload,
+        _id: user_id,
+        email_verify_token,
+        password: hashPassword(payload.password)
       })
-      await databaseService.users.insertOne(
-        new User({
-          ...payload,
-          _id: user_id,
-          email_verify_token,
-          password: hashPassword(payload.password)
-        })
-      )
-      const [Access_Token, Refresh_Token] = await this.signAccessAndRefreshToken({
-        user_id: user_id.toString(),
-        verify: UserVerifyStatus.Unverified
-      })
-      const { iat, exp } = await this.decodeRefreshToken(Refresh_Token)
-      await databaseService.refreshTokens.insertOne(
-        new RefreshToken({ user_id: new ObjectId(user_id), token: Refresh_Token, iat, exp })
-      )
-      await this.sendVerificationEmail(payload.email, email_verify_token)
-      return {
-        message: 'Please check your email to verify your account.'
-      }
-    } catch (error) {
-      console.error('Error during registration:', error)
-      throw new Error('An error occurred during registration. Please try again later.')
+    )
+    const [Access_Token, Refresh_Token] = await this.signAccessAndRefreshToken({
+      user_id: user_id.toString(),
+      verify: UserVerifyStatus.Unverified
+    })
+    const { iat, exp } = await this.decodeRefreshToken(Refresh_Token)
+    await databaseService.refreshTokens.insertOne(
+      new RefreshToken({ user_id: new ObjectId(user_id), token: Refresh_Token, iat, exp })
+    )
+    await mailService.sendVerificationEmail(payload.email, email_verify_token)
+    return {
+      message: 'Please check your email to verify your account.'
     }
   }
   async login({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
@@ -276,64 +152,49 @@ class UsersService {
     const _id = new ObjectId()
     const user = await databaseService.users.findOne({ email: email })
     const userId = new ObjectId(user?._id)
-    await Promise.all([
-      databaseService.otps.deleteMany({ user_id: userId }),
-      databaseService.otps.insertOne(
-        new Otps({
-          _id,
-          user_id: userId,
-          otp
-        })
-      )
-    ])
+    await databaseService.otps.deleteMany({ user_id: userId })
+    await databaseService.otps.insertOne(
+      new Otps({
+        _id,
+        user_id: userId,
+        otp
+      })
+    )
     return _id
   }
   async forgotPasswordService(email: string) {
     const otp = this.generateOtp().toString()
-    const [otp_id] = await Promise.all([this.saveOtpDatabase(email, otp), this.sendOTPEmail(email, otp)])
+    const [otp_id] = await Promise.all([this.saveOtpDatabase(email, otp), mailService.sendOTPEmail(email, otp)])
     return otp_id
   }
   async verifyOtp(otp_id: string) {
-    try {
-      await databaseService.otps.updateOne(
+    await databaseService.otps.updateOne(
+      {
+        _id: new ObjectId(otp_id)
+      },
+      [
         {
-          _id: new ObjectId(otp_id)
-        },
-        [
-          {
-            $set: {
-              status: ForgotPasswordVerifyStatus.Verified,
-              updated_at: '$$NOW'
-            }
+          $set: {
+            status: ForgotPasswordVerifyStatus.Verified,
+            updated_at: '$$NOW'
           }
-        ]
-      )
-    } catch (error) {
-      console.error('Error during verifyOTPAndResetPassword:', error)
-      throw new Error('An error occurred during verify OTP and reset password. Please try again later.')
-    }
+        }
+      ]
+    )
   }
   async resetPassword({ email, password, otp_id }: { email: string; password: string; otp_id: string }) {
-    try {
-      const user = await databaseService.users.findOne({ email })
-      if (!user) {
-        throw new Error(USERS_MESSAGES.USER_NOT_FOUND)
-      }
-      await databaseService.users.updateOne(
-        { _id: user._id }, // Sử dụng _id để tìm kiếm người dùng
-        {
-          $set: { password: hashPassword(password), updated_at: Date.now() }
-        }
-      )
-      // Xóa bản ghi OTP
-      await databaseService.otps.deleteOne({ _id: new ObjectId(otp_id) })
-      return {
-        message: USERS_MESSAGES.PASSWORD_RESET_SUCCESS
-      }
-    } catch (error) {
-      console.error('Error during verifyOTPAndResetPassword:', error)
-      throw new Error('An error occurred during verify OTP and reset password. Please try again later.')
+    const user = await databaseService.users.findOne({ email })
+    if (!user) {
+      throw new Error(USERS_MESSAGES.USER_NOT_FOUND)
     }
+    await databaseService.users.updateOne(
+      { _id: user._id }, // Sử dụng _id để tìm kiếm người dùng
+      {
+        $set: { password: hashPassword(password), updated_at: Date.now() }
+      }
+    )
+    // Xóa bản ghi OTP
+    await databaseService.otps.deleteOne({ _id: new ObjectId(otp_id) })
   }
 }
 

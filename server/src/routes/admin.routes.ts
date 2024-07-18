@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { loginController } from '~/controllers/users.controllers'
-import { adminLoginValidator } from '~/middlewares/users.middlewares'
+import { adminLoginValidator } from '~/middlewares/admin.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
 
 export const adminRouter = Router()
