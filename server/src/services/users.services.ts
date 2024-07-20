@@ -111,19 +111,20 @@ class UsersService {
       message: 'Please check your email to verify your account.'
     }
   }
-  async login({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
+  async login(user: User) {
     const [access_token, refresh_token] = await this.signAccessAndRefreshToken({
-      user_id,
-      verify
+      user_id: user._id?.toString() || '',
+      verify: user.verify
     })
     const { iat, exp } = await this.decodeRefreshToken(refresh_token)
 
     await databaseService.refreshTokens.insertOne(
-      new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token, iat, exp })
+      new RefreshToken({ user_id: new ObjectId(user._id), token: refresh_token, iat, exp })
     )
     return {
       access_token,
-      refresh_token
+      refresh_token,
+      role: user.role
     }
   }
   async verifyEmail(user_id: string) {

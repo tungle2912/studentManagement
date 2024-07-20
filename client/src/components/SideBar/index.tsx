@@ -1,28 +1,48 @@
-import styles from './style.module.scss'
-import img from '../../assets/images/avt2.jpg'
-import iconLogOut from '../../assets/icons/logout.svg'
 import { NavLink } from 'react-router-dom'
+import iconLogOut from '../../assets/icons/logout.svg'
+import img from '../../assets/images/avt2.jpg'
 import { navLinks } from '../../constants/links'
+import { removeAuthFromCookie } from '../../lib/utils'
+import styles from './style.module.scss'
+import { publicAdminRoutes } from '../../config/admin.routes'
+import { useEffect } from 'react'
+
 type Props = {
   className?: string
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-function index(props: Props) {
+const handleLogout = async () => {
+  try {
+    // await axios.post('/api/logout') // Replace with your actual logout API endpoint
+    removeAuthFromCookie()
+    window.location.href = publicAdminRoutes.login
+  } catch (error) {
+    console.error('Logout failed:', error)
+  }
+}
+
+function Sidebar(props: Props) {
   const { setIsOpen } = props
+
   const closeNavBar = () => {
     if (window.innerWidth < 768) {
       setIsOpen(false)
     }
-    window.addEventListener('resize', closeNavBar)
-    // Dọn dẹp event listener khi component unmount
-    return () => window.removeEventListener('resize', closeNavBar)
   }
+
+  window.addEventListener('resize', closeNavBar)
+  // Clean up event listener when component unmounts
+  useEffect(() => {
+    return () => window.removeEventListener('resize', closeNavBar)
+  }, [])
+
   const sidebarContentClass = `${styles.sidebarContent} ${props.className}`
+
   return (
     <div className={sidebarContentClass}>
       <div className={styles.sidebarHeader}>
-        <div className={styles.sidebarTittle}>CURD OPERATIONS</div>
+        <div className={styles.sidebarTittle}>CRUD OPERATIONS</div>
         <div className={styles.sideberProfile}>
           <img className={styles.sidebarHeaderImg} src={img} alt='' />
           <span className={styles.sidebarUserName}>Karthi Madesh</span>
@@ -33,18 +53,17 @@ function index(props: Props) {
         <ul className={styles.navItems}>
           {navLinks.map(({ id, label, to, icon }) => (
             <li key={id}>
-              <NavLink onClick={closeNavBar} className={styles.navItem} to={to}>
+              <NavLink
+                onClick={closeNavBar}
+                className={({ isActive }) => (isActive ? `${styles.navItem} ${styles.activeNavItem}` : styles.navItem)}
+                to={to}
+                end
+              >
                 <img src={icon} alt='' />
                 <span>{label}</span>
               </NavLink>
             </li>
           ))}
-          {/* <NavItem text='Home'></NavItem>
-          <NavItem text='Course'></NavItem>
-          <NavItem text='Students'></NavItem>
-          <NavItem text='Payment'></NavItem>
-          <NavItem text='Report'></NavItem>
-          <NavItem text='Settings'></NavItem> */}
         </ul>
         <div className={styles.sideBarBottom}>
           <div className={styles.profile}>
@@ -54,14 +73,14 @@ function index(props: Props) {
               <span className={styles.sidebarUserRole}>Admin</span>
             </div>
           </div>
-          <NavLink to={'/login'} className={styles.logOut}>
+          <div onClick={handleLogout} className={styles.logOut}>
             <span className={styles.logOutText}>Logout</span>
             <img className={styles.logOutIcon} src={iconLogOut} alt='' />
-          </NavLink>
+          </div>
         </div>
       </div>
     </div>
   )
 }
 
-export default index
+export default Sidebar

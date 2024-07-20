@@ -32,6 +32,13 @@ export const isAxiosExpiredAccessTokenError = <ExpiredAccessTokenError>(
     }>
   >(error)
 }
+export const setRoleToLocalCookie = (role: number) => {
+  Cookies.set('role', role.toString(), { expires: 7 })
+}
+export const getRoleFromCookie = () => {
+  const role = Cookies.get('role')
+  return role ? +role : undefined
+}
 
 export const setAccessTokenToLocalCookie = (access_token: string) => {
   Cookies.set('access_token', access_token, {
@@ -56,5 +63,8 @@ export const getRefreshTokenFromCookie = () => {
 export const removeAuthFromCookie = () => {
   Cookies.remove('access_token')
   Cookies.remove('refresh_token')
-  Cookies.remove('profile')
+  Cookies.remove('role')
+}
+export const isAdminRoute = (pathname: string) => {
+  return pathname.includes('/admin')
 }

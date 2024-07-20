@@ -1,8 +1,9 @@
 export const publicUserRoutes = {
-  home: '/',
   login: '/login',
   register: '/register',
-  forgotpassword: '/forgotpassword',
+  forgotpassword: '/forgotpassword'
 } as const
 
-export const privateUserRoutes = {} as const
+export const privateUserRoutes = {
+  home: '/'
+} as const

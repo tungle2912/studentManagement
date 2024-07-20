@@ -1,36 +1,140 @@
+import { Navigate, Outlet, useLocation, useRoutes } from 'react-router-dom'
 import './App.css'
-import { useRoutes } from 'react-router-dom'
-import { publicAdminRoutes, privateAdminRoutes } from './config/admin.routes'
-import { publicUserRoutes } from './config/users.routes'
-import MainLayout from './layouts/MainLayout'
+import { privateAdminRoutes, publicAdminRoutes } from './config/admin.routes'
+import { privateUserRoutes, publicUserRoutes } from './config/users.routes'
+import useAuth from './hooks/data/useAuth'
 import AuthLayout from './layouts/AuthLayout'
-import Login from './pages/Admin/login'
-import Home from './pages/Admin/home'
-import Payment from './pages/Admin/payment'
-import Students from './pages/Admin/students'
-import Settings from './pages/Admin/settings'
-import Report from './pages/Admin/report'
+import MainLayout from './layouts/MainLayout'
+import { isAdminRoute } from './lib/utils'
 import Course from './pages/Admin/course'
-import Register from './pages/Admin/register'
+import Dashboard from './pages/Admin/dashboard'
 import Forgotpassword from './pages/Admin/forgotpassword'
+import Login from './pages/Admin/login'
+import Payment from './pages/Admin/payment'
+import Register from './pages/Admin/register'
+import Report from './pages/Admin/report'
+import Settings from './pages/Admin/settings'
+import Students from './pages/Admin/students'
+
+function ProtectedRoute() {
+  const { isAuthenticated } = useAuth()
+  const location = useLocation()
+  const isAdmin = isAdminRoute(location.pathname)
+  console.log('ProtectedRoute', isAuthenticated)
+  return isAuthenticated ? (
+    <Outlet />
+  ) : (
+    <Navigate
+      to={isAdmin ? publicAdminRoutes.login : publicUserRoutes.login}
+      state={{ from: location }}
+      replace={true}
+    />
+  )
+}
+function RejectedRoute() {
+  const { isAuthenticated } = useAuth()
+  const location = useLocation()
+  const isAdmin = isAdminRoute(location.pathname)
+  return isAuthenticated ? (
+    <Navigate to={isAdmin ? privateAdminRoutes.dashboard : privateUserRoutes.home} />
+  ) : (
+    <Outlet />
+  )
+}
 
 function App() {
   const elements = useRoutes([
     {
-      path: publicUserRoutes.login, // /login
-      element: (
-        <AuthLayout>
-          <Login />
-        </AuthLayout>
-      )
+      path: privateAdminRoutes.dashboard,
+      element: <ProtectedRoute />,
+      children: [
+        {
+          path: '',
+          element: (
+            <MainLayout>
+              <Dashboard />
+            </MainLayout>
+          )
+        },
+        {
+          path: privateAdminRoutes.payment,
+          element: (
+            <MainLayout>
+              <Payment />
+            </MainLayout>
+          )
+        },
+        {
+          path: privateAdminRoutes.course,
+          element: (
+            <MainLayout>
+              <Course />
+            </MainLayout>
+          )
+        },
+        {
+          path: privateAdminRoutes.report,
+          element: (
+            <MainLayout>
+              <Report />
+            </MainLayout>
+          )
+        },
+        {
+          path: privateAdminRoutes.students,
+          element: (
+            <MainLayout>
+              <Students />
+            </MainLayout>
+          )
+        },
+        {
+          path: privateAdminRoutes.settings,
+          element: (
+            <MainLayout>
+              <Settings />
+            </MainLayout>
+          )
+        }
+      ]
     },
     {
-      path: publicAdminRoutes.login, // /login
-      element: (
-        <AuthLayout>
-          <Login />
-        </AuthLayout>
-      )
+      path: publicAdminRoutes.login,
+      element: <RejectedRoute />,
+      children: [
+        {
+          path: '',
+          element: (
+            <AuthLayout>
+              <Login />
+            </AuthLayout>
+          )
+        }
+      ]
+    },
+    {
+      path: privateUserRoutes.home,
+      element: <ProtectedRoute />,
+      children: [
+        {
+          path: '',
+          element: <div>Home</div>
+        }
+      ]
+    },
+    {
+      path: publicUserRoutes.login,
+      element: <RejectedRoute />,
+      children: [
+        {
+          path: '',
+          element: (
+            <AuthLayout>
+              <Login />
+            </AuthLayout>
+          )
+        }
+      ]
     },
     {
       path: publicUserRoutes.register,
@@ -46,54 +150,6 @@ function App() {
         <AuthLayout>
           <Forgotpassword />
         </AuthLayout>
-      )
-    },
-    {
-      path: privateAdminRoutes.home,
-      element: (
-        <MainLayout>
-          <Home />
-        </MainLayout>
-      )
-    },
-    {
-      path: privateAdminRoutes.payment,
-      element: (
-        <MainLayout>
-          <Payment />
-        </MainLayout>
-      )
-    },
-    {
-      path: privateAdminRoutes.course,
-      element: (
-        <MainLayout>
-          <Course />
-        </MainLayout>
-      )
-    },
-    {
-      path: privateAdminRoutes.report,
-      element: (
-        <MainLayout>
-          <Report />
-        </MainLayout>
-      )
-    },
-    {
-      path: privateAdminRoutes.students,
-      element: (
-        <MainLayout>
-          <Students />
-        </MainLayout>
-      )
-    },
-    {
-      path: privateAdminRoutes.settings,
-      element: (
-        <MainLayout>
-          <Settings />
-        </MainLayout>
       )
     }
   ])

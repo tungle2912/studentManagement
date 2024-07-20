@@ -17,7 +17,7 @@ class MailService {
 
     const mailOptions = {
       from: envConfig.emailUsername,
-      to: 'tung291203@gmail.com',
+      to: userEmail,
       subject: 'Email Verification',
       html: `<p>Please click the link below to verify your email:</p><a href="${verificationLink}">Verify Email</a>`
     }

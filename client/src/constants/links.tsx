@@ -11,7 +11,7 @@ export const navLinks: navLink[] = [
   {
     id: 1,
     label: 'Home',
-    to: privateAdminRoutes.home,
+    to: privateAdminRoutes.dashboard,
     icon: icons.home
   },
   {

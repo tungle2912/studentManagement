@@ -1,43 +1,51 @@
-import { Button, Checkbox, Form, message } from 'antd'
-import Input from '../../../components/Input'
-import axios from '../../../api/axios'
+import { Button, Form, message } from 'antd'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
+import axios from '../../../api/axios'
 import Tittle from '../../../common/Tittle'
-import styles from './style.module.scss'
-import { setAccessTokenToLocalCookie, setRefreshTokenToCookie } from '../../../lib/utils'
+import Input from '../../../components/Input'
 import { RoleType } from '../../../constants/enums'
 import { rules } from '../../../lib/rules'
+import {
+  isAdminRoute,
+  setAccessTokenToLocalCookie,
+  setRefreshTokenToCookie,
+  setRoleToLocalCookie
+} from '../../../lib/utils'
+import styles from './style.module.scss'
+import useAuth from '../../../hooks/data/useAuth'
 
 function Login() {
   const [form] = Form.useForm()
   const location = useLocation()
+  const { setIsAuthenticated } = useAuth() // Thêm setIsAuthenticated
   const navigate = useNavigate() // Thêm useNavigate
-  const isAdminLogin = location.pathname === '/admin/login'
+  const isAdminLogin = isAdminRoute(location.pathname)
   const params = new URLSearchParams(window.location.search)
   const email = params.get('email')
   if (email) {
     form.setFieldsValue({ email })
   }
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onFinish = async (values: any) => {
     const url = isAdminLogin ? '/admin/login' : 'users/login'
     try {
       const response = await axios.post(url, values)
-      const { access_token, refresh_token } = response.data.result
-      setAccessTokenToLocalCookie(access_token)
+      const { access_token, refresh_token, role } = response.data.result
       setRefreshTokenToCookie(refresh_token)
+      setAccessTokenToLocalCookie(access_token)
+      setRoleToLocalCookie(role)
+      setIsAuthenticated(true)
       message.success('Login successful!')
-      console.log(values.remember)
-      if (values.remember) {
-        localStorage.setItem('Email', values.email)
-        localStorage.setItem('Password', values.password)
-      }
-      const role = response.data.role
       if (role == RoleType.User) {
-        navigate('/')
+        console.log('navigate to /')
+        setTimeout(() => {
+          navigate('/')
+        }, 1000)
       } else {
-        navigate('/admin')
+        setTimeout(() => {
+          console.log('navigate to /admin')
+          navigate('/admin')
+        }, 1000)
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
@@ -65,6 +73,14 @@ function Login() {
           <Tittle className={styles.loginFormTittle} text='CURD OPERATION' />
           <span className={styles.loginSignIn}>SIGN IN</span>
           <p className={styles.loginDescription}>Enter your credentials to access your account</p>
+          <button
+            onClick={() => {
+              navigate('/admin')
+              console.log('navigate to /admin')
+            }}
+          >
+            a
+          </button>
         </div>
         <Form
           className={styles.loginFormContent}
@@ -78,17 +94,21 @@ function Login() {
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
         >
-          <Input name='email' label='Email' placeholder='Enter your email' rules={rules.email} />
+          <Input
+            name='email'
+            autocomplete='username'
+            label='Email'
+            placeholder='Enter your email'
+            rules={rules.email}
+          />
           <Input
             type='password'
             name='password'
             label='Password'
             placeholder='Enter your password'
+            autocomplete='current-password'
             rules={rules.password}
           />
-          <Form.Item name='remember'>
-            <Checkbox>Remember me</Checkbox>
-          </Form.Item>
           <Form.Item>
             <Button className={styles.loginFormButton} type='primary' htmlType='submit'>
               SIGN IN

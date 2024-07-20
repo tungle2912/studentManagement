@@ -9,14 +9,29 @@ interface InputProps {
   className?: string
   dependencies?: string[]
   initialValue?: string | null
+  autocomplete?: string
   type?: 'password' | 'text'
 }
 
-function Input({ name, placeholder, label, rules, className, dependencies, initialValue, type }: InputProps) {
+function Input({
+  name,
+  placeholder,
+  label,
+  rules,
+  className,
+  dependencies,
+  initialValue,
+  autocomplete,
+  type
+}: InputProps) {
   const TypeInput = type === 'password' ? AntInput.Password : AntInput
   return (
     <Form.Item name={name} rules={rules} label={label} initialValue={initialValue} dependencies={dependencies}>
-      <TypeInput className={`${styles.input} ${className}`} placeholder={placeholder}></TypeInput>
+      <TypeInput
+        className={`${styles.input} ${className}`}
+        autoComplete={autocomplete}
+        placeholder={placeholder}
+      ></TypeInput>
     </Form.Item>
   )
 }

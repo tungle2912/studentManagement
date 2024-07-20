@@ -2,7 +2,7 @@ import styles from './style.module.scss'
 import DashBoardItem from '../../../components/DashBoardItem'
 
 
-function Home() {
+function Dashboard() {
   // Function to format number as currency
   const formatCurrency = (number: number) => {
     return `INR ${Intl.NumberFormat('en-IN', { maximumSignificantDigits: 3 }).format(number)}`
@@ -18,4 +18,4 @@ function Home() {
   )
 }
 
-export default Home
+export default Dashboard
