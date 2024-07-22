@@ -1,25 +1,26 @@
 import { NextFunction, Request, Response } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
 import { ObjectId } from 'mongodb'
-import { USERS_MESSAGES } from '~/constants/messages'
+import { AUTH_MESSAGES } from '~/constants/messages'
 import {
   LoginReqBody,
+  logoutReqBody,
   RegisterReqBody,
   requestOTPReqBody,
   ResetPasswordReqBody,
   TokenPayload,
   VerifyEmailReqBody,
   verifyOTPReqBody
-} from '~/models/requests/User.requests'
-import User from '~/models/schemas/User.schema'
+} from '~/models/requests/auth.requests'
+import User from '~/models/schemas/user.schema'
 import databaseService from '~/services/database.services'
-import usersService from '~/services/users.services'
+import usersService from '~/services/atuh.services'
 
 export const loginController = async (req: Request<ParamsDictionary, any, LoginReqBody>, res: Response) => {
   const user = req.user as User
   const result = await usersService.login(user)
   return res.json({
-    message: USERS_MESSAGES.LOGIN_SUCCESS,
+    message: AUTH_MESSAGES.LOGIN_SUCCESS,
     result
   })
 }
@@ -31,7 +32,7 @@ export const registerController = async (
   try {
     await usersService.register(req.body)
     return res.json({
-      message: USERS_MESSAGES.REGISTER_SUCCESS
+      message: AUTH_MESSAGES.REGISTER_SUCCESS
     })
   } catch (error) {
     next(error)
@@ -49,9 +50,9 @@ export const verifyEmailController = async (
       _id: new ObjectId(user_id)
     })
     let message
-    let redirectUrl = `http://localhost:3000/login`
+    const redirectUrl = `http://localhost:3000/login`
     if (!user) {
-      message = USERS_MESSAGES.USER_NOT_FOUND
+      message = AUTH_MESSAGES.USER_NOT_FOUND
     } else {
       const currentTime = Math.floor(Date.now() / 1000)
       if (exp < currentTime) {
@@ -59,13 +60,12 @@ export const verifyEmailController = async (
         await databaseService.users.deleteOne({
           _id: new ObjectId(user_id)
         })
-        message = USERS_MESSAGES.EMAIL_VERIFY_TOKEN_EXPIRED
+        message = AUTH_MESSAGES.EMAIL_VERIFY_TOKEN_EXPIRED
       } else if (user.email_verify_token === '') {
-        message = USERS_MESSAGES.EMAIL_ALREADY_VERIFIED_BEFORE
+        message = AUTH_MESSAGES.EMAIL_ALREADY_VERIFIED_BEFORE
       } else {
         await usersService.verifyEmail(user_id)
-        message = USERS_MESSAGES.EMAIL_VERIFY_SUCCESS
-        redirectUrl = `http://localhost:3000/login?email=${encodeURIComponent(user.email)}`
+        message = AUTH_MESSAGES.EMAIL_VERIFY_SUCCESS
       }
     }
 
@@ -112,9 +112,36 @@ export const forgotPasswordController = {
     try {
       const { email, password, otp_id } = req.body
       const result = await usersService.resetPassword({ email, password, otp_id })
-      res.status(200).json({ message: USERS_MESSAGES.RESET_PASSWORD_SUCCESS })
+      res.status(200).json({ message: AUTH_MESSAGES.RESET_PASSWORD_SUCCESS })
     } catch (error) {
       next(error)
     }
   }
+}
+export const logoutController = async (
+  req: Request<ParamsDictionary, any, logoutReqBody>,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { refresh_token } = req.body
+    await usersService.logout(refresh_token)
+    res.status(200).json({ message: AUTH_MESSAGES.LOGOUT_SUCCESS })
+  } catch (error) {
+    next(error)
+  }
+}
+export const refreshTokenController = async (
+  req: Request<ParamsDictionary, any, { refresh_token: string }>,
+  res: Response
+) => {
+  const { user_id, verify } = req.decoded_refresh_token as TokenPayload
+
+  const { refresh_token } = req.body
+
+  const result = await usersService.refreshToken({ refresh_token, user_id, verify })
+  return res.json({
+    message: 'Refresh token successfully',
+    data: result
+  })
 }

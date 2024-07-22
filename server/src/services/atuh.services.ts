@@ -1,11 +1,11 @@
 import { ObjectId } from 'mongodb'
 import { envConfig } from '~/constants/config'
-import { ForgotPasswordVerifyStatus, TokenType, UserVerifyStatus } from '~/constants/enums'
-import { USERS_MESSAGES } from '~/constants/messages'
-import { RegisterReqBody } from '~/models/requests/User.requests'
+import { ForgotPasswordVerifyStatus, RoleType, TokenType, UserVerifyStatus } from '~/constants/enums'
+import { AUTH_MESSAGES } from '~/constants/messages'
+import { RegisterReqBody } from '~/models/requests/auth.requests'
 import Otps from '~/models/schemas/otps.chema'
-import RefreshToken from '~/models/schemas/RefreshToken.chema'
-import User from '~/models/schemas/User.schema'
+import RefreshToken from '~/models/schemas/refreshtoken.schema'
+import User from '~/models/schemas/user.schema'
 import { hashPassword } from '~/utils/crypto'
 import { signToken, verifyToken } from '~/utils/jwt'
 import databaseService from './database.services'
@@ -50,7 +50,8 @@ class UsersService {
     })
   }
   async checkEmailExist(email: string) {
-    const user = await databaseService.users.findOne({ email })
+    await databaseService.users.deleteOne({ email, verify: UserVerifyStatus.Unverified })
+    const user = await databaseService.users.findOne({ email, verify: UserVerifyStatus.Verified })
     return Boolean(user)
   }
   private signEmailVerifyToken({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
@@ -66,8 +67,12 @@ class UsersService {
       }
     })
   }
-  private signAccessAndRefreshToken({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
-    return Promise.all([this.signAccessToken({ user_id, verify }), this.signRefreshToken({ user_id, verify })])
+  private async signAccessAndRefreshToken({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
+    const [access_token, refresh_token] = await Promise.all([
+      this.signAccessToken({ user_id, verify }),
+      this.signRefreshToken({ user_id, verify })
+    ])
+    return { access_token, refresh_token }
   }
   async checkExpEmailVerifyToken({ user_id, exp }: { user_id: string; exp: number }) {
     setTimeout(async () => {
@@ -98,13 +103,12 @@ class UsersService {
         password: hashPassword(payload.password)
       })
     )
-    const [Access_Token, Refresh_Token] = await this.signAccessAndRefreshToken({
+    const { access_token, refresh_token } = await this.signAccessAndRefreshToken({
       user_id: user_id.toString(),
       verify: UserVerifyStatus.Unverified
     })
-    const { iat, exp } = await this.decodeRefreshToken(Refresh_Token)
     await databaseService.refreshTokens.insertOne(
-      new RefreshToken({ user_id: new ObjectId(user_id), token: Refresh_Token, iat, exp })
+      new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token })
     )
     await mailService.sendVerificationEmail(payload.email, email_verify_token)
     return {
@@ -112,14 +116,12 @@ class UsersService {
     }
   }
   async login(user: User) {
-    const [access_token, refresh_token] = await this.signAccessAndRefreshToken({
+    const { access_token, refresh_token } = await this.signAccessAndRefreshToken({
       user_id: user._id?.toString() || '',
       verify: user.verify
     })
-    const { iat, exp } = await this.decodeRefreshToken(refresh_token)
-
     await databaseService.refreshTokens.insertOne(
-      new RefreshToken({ user_id: new ObjectId(user._id), token: refresh_token, iat, exp })
+      new RefreshToken({ user_id: new ObjectId(user._id), token: refresh_token })
     )
     return {
       access_token,
@@ -140,7 +142,7 @@ class UsersService {
         }
       ])
     ])
-    const [access_token, refresh_token] = token
+    const { access_token, refresh_token } = token
     return {
       access_token,
       refresh_token
@@ -186,7 +188,7 @@ class UsersService {
   async resetPassword({ email, password, otp_id }: { email: string; password: string; otp_id: string }) {
     const user = await databaseService.users.findOne({ email })
     if (!user) {
-      throw new Error(USERS_MESSAGES.USER_NOT_FOUND)
+      throw new Error(AUTH_MESSAGES.USER_NOT_FOUND)
     }
     await databaseService.users.updateOne(
       { _id: user._id }, // Sử dụng _id để tìm kiếm người dùng
@@ -196,6 +198,29 @@ class UsersService {
     )
     // Xóa bản ghi OTP
     await databaseService.otps.deleteOne({ _id: new ObjectId(otp_id) })
+  }
+  async logout(refresh_token: string) {
+    await databaseService.refreshTokens.deleteOne({ token: refresh_token })
+  }
+  async refreshToken({
+    refresh_token,
+    user_id,
+    verify
+  }: {
+    user_id: string
+    refresh_token: string
+    verify: UserVerifyStatus
+  }) {
+    const [tokens] = await Promise.all([
+      this.signAccessAndRefreshToken({ user_id, verify }),
+      databaseService.refreshTokens.deleteOne({
+        user_id: new ObjectId(user_id)
+      })
+    ])
+    await databaseService.refreshTokens.insertOne(
+      new RefreshToken({ user_id: new ObjectId(user_id), token: tokens.refresh_token })
+    )
+    return tokens
   }
 }
 

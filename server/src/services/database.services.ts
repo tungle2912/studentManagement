@@ -1,9 +1,10 @@
-import { MongoClient, Db, Collection } from 'mongodb'
 import 'dotenv/config'
-import User from '~/models/schemas/User.schema'
-import RefreshToken from '~/models/schemas/RefreshToken.chema'
+import { Collection, Db, MongoClient } from 'mongodb'
 import { envConfig } from '~/constants/config'
-import Otps from '~/models/schemas/otps.chema'
+import Otp from '~/models/schemas/otps.chema'
+import RefreshToken from '~/models/schemas/refreshtoken.schema'
+import Student from '~/models/schemas/student.schema'
+import User from '~/models/schemas/user.schema'
 
 const uri = `mongodb+srv://${envConfig.dbUsername}:${envConfig.dbPassword}@studentmanagement.bygjalp.mongodb.net/`
 
@@ -29,7 +30,12 @@ class DatabaseService {
     if (!exists) {
       this.users.createIndex({ email: 1, password: 1 })
       this.users.createIndex({ email: 1 }, { unique: true })
-      this.users.createIndex({ username: 1 }, { unique: true })
+    }
+  }
+  async indexStudents() {
+    const exists = await this.students.indexExists(['created_at_1'])
+    if (!exists) {
+      await this.students.createIndex({ created_at: 1 })
     }
   }
   async indexRefreshTokens() {
@@ -48,15 +54,15 @@ class DatabaseService {
   get users(): Collection<User> {
     return this.db.collection('users')
   }
-
   get refreshTokens(): Collection<RefreshToken> {
     return this.db.collection('refresh_token')
   }
-  get otps(): Collection<Otps> {
+  get otps(): Collection<Otp> {
     return this.db.collection('otps')
   }
-
-
+  get students(): Collection<Student> {
+    return this.db.collection('students')
+  }
 }
 
 // Tạo object từ class DatabaseService

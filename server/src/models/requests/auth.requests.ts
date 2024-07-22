@@ -4,12 +4,16 @@ import { TokenType, UserVerifyStatus } from '~/constants/enums'
 export interface LoginReqBody {
   email: string
   password: string
+  role: number
 }
 
 export interface VerifyEmailReqBody {
   email_verify_token: string
 }
 
+export interface logoutReqBody {
+  refresh_token: string
+}
 
 export interface RegisterReqBody {
   name: string

@@ -1,4 +1,4 @@
-export const USERS_MESSAGES = {
+export const AUTH_MESSAGES = {
   VALIDATION_ERROR: 'Validation error',
   NAME_IS_REQUIRED: 'Name is required',
   NAME_MUST_BE_A_STRING: 'Name must be a string',
@@ -24,6 +24,7 @@ export const USERS_MESSAGES = {
   LOGIN_SUCCESS: 'Login success',
   REGISTER_SUCCESS: 'Please check your email to verify your account.',
   ACCESS_TOKEN_IS_REQUIRED: 'Access token is required',
+  ACCESS_TOKEN_INVALID: 'Access token invalid',
   REFRESH_TOKEN_IS_REQUIRED: 'Refresh token is required',
   REFRESH_TOKEN_IS_INVALID: 'Refresh token is invalid',
   REFRESH_TOKEN_NOT_EXIST: 'Refresh token not exist',
@@ -45,6 +46,7 @@ export const USERS_MESSAGES = {
   INVALID_FORGOT_PASSWORD_TOKEN: 'Invalid forgot password token',
   RESET_PASSWORD_SUCCESS: 'Reset password success',
   GET_ME_SUCCESS: 'Get my profile success',
-  USER_NOT_VERIFIED: 'User not verified'
-  
+  USER_NOT_VERIFIED: 'User not verified',
+  PERMISSION_DENIED: 'Permission denied',
 } as const
+

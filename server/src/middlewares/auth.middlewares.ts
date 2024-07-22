@@ -5,27 +5,27 @@ import { capitalize } from 'lodash'
 import { ObjectId } from 'mongodb'
 import { ForgotPasswordVerifyStatus, RoleType, UserVerifyStatus } from '~/constants/enums'
 import HTTP_STATUS from '~/constants/httpStatus'
-import { USERS_MESSAGES } from '~/constants/messages'
+import { AUTH_MESSAGES } from '~/constants/messages'
 import { ErrorWithStatus } from '~/models/Errors'
 import databaseService from '~/services/database.services'
-import usersService from '~/services/users.services'
+import usersService from '~/services/atuh.services'
 import { hashPassword } from '~/utils/crypto'
 import { verifyToken } from '~/utils/jwt'
 import { validate } from '~/utils/validation'
 
 const passwordSchema: ParamSchema = {
   notEmpty: {
-    errorMessage: USERS_MESSAGES.PASSWORD_IS_REQUIRED
+    errorMessage: AUTH_MESSAGES.PASSWORD_IS_REQUIRED
   },
   isString: {
-    errorMessage: USERS_MESSAGES.PASSWORD_MUST_BE_A_STRING
+    errorMessage: AUTH_MESSAGES.PASSWORD_MUST_BE_A_STRING
   },
   isLength: {
     options: {
       min: 6,
       max: 50
     },
-    errorMessage: USERS_MESSAGES.PASSWORD_LENGTH_MUST_BE_FROM_6_TO_50
+    errorMessage: AUTH_MESSAGES.PASSWORD_LENGTH_MUST_BE_FROM_6_TO_50
   },
   isStrongPassword: {
     options: {
@@ -35,22 +35,22 @@ const passwordSchema: ParamSchema = {
       minNumbers: 1,
       minSymbols: 1
     },
-    errorMessage: USERS_MESSAGES.PASSWORD_MUST_BE_STRONG
+    errorMessage: AUTH_MESSAGES.PASSWORD_MUST_BE_STRONG
   }
 }
 const confirmPasswordSchema: ParamSchema = {
   notEmpty: {
-    errorMessage: USERS_MESSAGES.CONFIRM_PASSWORD_IS_REQUIRED
+    errorMessage: AUTH_MESSAGES.CONFIRM_PASSWORD_IS_REQUIRED
   },
   isString: {
-    errorMessage: USERS_MESSAGES.CONFIRM_PASSWORD_MUST_BE_A_STRING
+    errorMessage: AUTH_MESSAGES.CONFIRM_PASSWORD_MUST_BE_A_STRING
   },
   isLength: {
     options: {
       min: 6,
       max: 50
     },
-    errorMessage: USERS_MESSAGES.CONFIRM_PASSWORD_LENGTH_MUST_BE_FROM_6_TO_50
+    errorMessage: AUTH_MESSAGES.CONFIRM_PASSWORD_LENGTH_MUST_BE_FROM_6_TO_50
   },
   isStrongPassword: {
     options: {
@@ -60,12 +60,12 @@ const confirmPasswordSchema: ParamSchema = {
       minNumbers: 1,
       minSymbols: 1
     },
-    errorMessage: USERS_MESSAGES.CONFIRM_PASSWORD_MUST_BE_STRONG
+    errorMessage: AUTH_MESSAGES.CONFIRM_PASSWORD_MUST_BE_STRONG
   },
   custom: {
     options: (value, { req }) => {
       if (value !== req.body.password) {
-        throw new Error(USERS_MESSAGES.CONFIRM_PASSWORD_MUST_BE_THE_SAME_AS_PASSWORD)
+        throw new Error(AUTH_MESSAGES.CONFIRM_PASSWORD_MUST_BE_THE_SAME_AS_PASSWORD)
       }
       return true
     }
@@ -77,7 +77,7 @@ const dateOfBirthSchema: ParamSchema = {
       strict: true,
       strictSeparator: true
     },
-    errorMessage: USERS_MESSAGES.DATE_OF_BIRTH_MUST_BE_ISO8601
+    errorMessage: AUTH_MESSAGES.DATE_OF_BIRTH_MUST_BE_ISO8601
   }
 }
 export const registerValidator = validate(
@@ -85,14 +85,14 @@ export const registerValidator = validate(
     {
       email: {
         isEmail: {
-          errorMessage: USERS_MESSAGES.EMAIL_IS_INVALID
+          errorMessage: AUTH_MESSAGES.EMAIL_IS_INVALID
         },
         trim: true,
         custom: {
           options: async (value) => {
             const isExistEmail = await usersService.checkEmailExist(value)
             if (isExistEmail) {
-              throw new Error(USERS_MESSAGES.EMAIL_ALREADY_EXISTS)
+              throw new Error(AUTH_MESSAGES.EMAIL_ALREADY_EXISTS)
             }
             return true
           }
@@ -109,7 +109,7 @@ export const loginValidator = validate(
     {
       email: {
         isEmail: {
-          errorMessage: USERS_MESSAGES.EMAIL_IS_INVALID
+          errorMessage: AUTH_MESSAGES.EMAIL_IS_INVALID
         },
         trim: true,
         custom: {
@@ -117,11 +117,11 @@ export const loginValidator = validate(
             const user = await databaseService.users.findOne({
               email: value,
               password: hashPassword(req.body.password),
-              role: RoleType.User,
+              role: req.body.role,
               verify: UserVerifyStatus.Verified
             })
             if (user === null) {
-              throw new Error(USERS_MESSAGES.EMAIL_OR_PASSWORD_IS_INCORRECT)
+              throw new Error(AUTH_MESSAGES.EMAIL_OR_PASSWORD_IS_INCORRECT)
             }
             req.user = user
             return true
@@ -142,7 +142,7 @@ export const emailVerifyTokenValidator = validate(
           options: async (value: string, { req }) => {
             if (!value) {
               throw new ErrorWithStatus({
-                message: USERS_MESSAGES.EMAIL_VERIFY_TOKEN_IS_REQUIRED,
+                message: AUTH_MESSAGES.EMAIL_VERIFY_TOKEN_IS_REQUIRED,
                 status: HTTP_STATUS.UNAUTHORIZED
               })
             }
@@ -176,7 +176,7 @@ export const accessTokenValidator = validate(
             const access_token = (value || '').split(' ')[1]
             if (!access_token) {
               throw new ErrorWithStatus({
-                message: USERS_MESSAGES.ACCESS_TOKEN_IS_REQUIRED,
+                message: AUTH_MESSAGES.ACCESS_TOKEN_IS_REQUIRED,
                 status: HTTP_STATUS.UNAUTHORIZED
               })
             }
@@ -205,13 +205,13 @@ export const refreshTokenValidator = validate(
     {
       refresh_token: {
         notEmpty: {
-          errorMessage: USERS_MESSAGES.REFRESH_TOKEN_IS_REQUIRED
+          errorMessage: AUTH_MESSAGES.REFRESH_TOKEN_IS_REQUIRED
         },
         custom: {
           options: async (value: string, { req }) => {
             if (!value) {
               throw new ErrorWithStatus({
-                message: USERS_MESSAGES.REFRESH_TOKEN_IS_REQUIRED,
+                message: AUTH_MESSAGES.REFRESH_TOKEN_IS_REQUIRED,
                 status: HTTP_STATUS.UNAUTHORIZED
               })
             }
@@ -219,10 +219,10 @@ export const refreshTokenValidator = validate(
               const [decoded_refresh_token, refresh_token] = await Promise.all([
                 verifyToken({ token: value, secretOrPublicKey: process.env.JWT_SECRET_REFRESH_TOKEN as string }),
                 databaseService.refreshTokens.findOne({ token: value })
-              ])
+              ])           
               if (refresh_token === null) {
                 throw new ErrorWithStatus({
-                  message: USERS_MESSAGES.REFRESH_TOKEN_NOT_EXIST,
+                  message: AUTH_MESSAGES.REFRESH_TOKEN_NOT_EXIST,
                   status: HTTP_STATUS.UNAUTHORIZED
                 })
               }
@@ -250,7 +250,7 @@ export const sendOtpForgotPasswordValidator = validate(
       email: {
         trim: true,
         isEmail: {
-          errorMessage: USERS_MESSAGES.EMAIL_IS_INVALID
+          errorMessage: AUTH_MESSAGES.EMAIL_IS_INVALID
         },
         custom: {
           options: async (value, { req }) => {
@@ -259,7 +259,7 @@ export const sendOtpForgotPasswordValidator = validate(
               verify: 1
             })
             if (user === null) {
-              throw new Error(USERS_MESSAGES.EMAIL_NOT_FOUND)
+              throw new Error(AUTH_MESSAGES.EMAIL_NOT_FOUND)
             }
             return true
           }
@@ -274,10 +274,10 @@ export const verifyOtpForgotPasswordValidator = validate(
     {
       otp: {
         notEmpty: {
-          errorMessage: USERS_MESSAGES.OTP_IS_REQUIRED
+          errorMessage: AUTH_MESSAGES.OTP_IS_REQUIRED
         },
         isNumeric: {
-          errorMessage: USERS_MESSAGES.OTP_IS_NOT_NUMBER
+          errorMessage: AUTH_MESSAGES.OTP_IS_NOT_NUMBER
         },
         custom: {
           options: async (value, { req }) => {
@@ -287,10 +287,10 @@ export const verifyOtpForgotPasswordValidator = validate(
               otp: value
             })
             if (!otp) {
-              throw new Error(USERS_MESSAGES.OTP_IS_WRONG)
+              throw new Error(AUTH_MESSAGES.OTP_IS_WRONG)
             }
             if (otp.expires_at && otp.expires_at < Date.now()) {
-              throw new Error(USERS_MESSAGES.OTP_INVALID_OR_EXPIRED)
+              throw new Error(AUTH_MESSAGES.OTP_INVALID_OR_EXPIRED)
             }
             return true
           }
@@ -306,7 +306,7 @@ export const resetPasswordValidator = validate(
       email: {
         trim: true,
         isEmail: {
-          errorMessage: USERS_MESSAGES.EMAIL_IS_INVALID
+          errorMessage: AUTH_MESSAGES.EMAIL_IS_INVALID
         },
         custom: {
           options: async (value, { req }) => {
@@ -316,7 +316,7 @@ export const resetPasswordValidator = validate(
               role: RoleType.User
             })
             if (user === null) {
-              throw new Error(USERS_MESSAGES.USER_NOT_FOUND)
+              throw new Error(AUTH_MESSAGES.USER_NOT_FOUND)
             }
             req.user = user
             return true
@@ -333,7 +333,7 @@ export const resetPasswordValidator = validate(
               status: ForgotPasswordVerifyStatus.Verified
             })
             if (!otp) {
-              throw new Error(USERS_MESSAGES.OTP_INVALID_OR_EXPIRED)
+              throw new Error(AUTH_MESSAGES.OTP_INVALID_OR_EXPIRED)
             }
             return true
           }

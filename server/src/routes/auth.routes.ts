@@ -2,27 +2,36 @@ import { Router } from 'express'
 import {
   forgotPasswordController,
   loginController,
+  refreshTokenController,
   registerController,
   verifyEmailController
-} from '~/controllers/users.controllers'
+} from '~/controllers/auth.controllers'
 import {
   emailVerifyTokenValidator,
   loginValidator,
+  refreshTokenValidator,
   registerValidator,
   resetPasswordValidator,
   sendOtpForgotPasswordValidator,
   verifyOtpForgotPasswordValidator
-} from '~/middlewares/users.middlewares'
+} from '~/middlewares/auth.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
-export const usersRouter = Router()
+export const authRouter = Router()
 
+/**
+ * path: /auth/refresh-token
+ * method: GET
+ * body: {refresh_token: string}
+ */
+
+authRouter.post('/refresh-token', refreshTokenValidator, wrapRequestHandler(refreshTokenController))
 /**
  * Description. Register a new user
  * Path: /register
  * Method: POST
  * Body: { name: string, email: string, password: string, confirm_password: string, date_of_birth: ISO8601 }
  */
-usersRouter.post('/register', registerValidator, wrapRequestHandler(registerController))
+authRouter.post('/register', registerValidator, wrapRequestHandler(registerController))
 
 /**
  * Description. user login
@@ -30,7 +39,7 @@ usersRouter.post('/register', registerValidator, wrapRequestHandler(registerCont
  * Method: POST
  * Body: {email: string, password: string,access_token: string}
  */
-usersRouter.post('/login', loginValidator, wrapRequestHandler(loginController))
+authRouter.post('/login', loginValidator, wrapRequestHandler(loginController))
 
 /**
  * Description. Verify email when user clinet click on the link in email
@@ -38,7 +47,7 @@ usersRouter.post('/login', loginValidator, wrapRequestHandler(loginController))
  * Method: POST
  * body: { email_verify_token: string }
  */
-usersRouter.get('/verify-email', emailVerifyTokenValidator, wrapRequestHandler(verifyEmailController))
+authRouter.get('/verify-email', emailVerifyTokenValidator, wrapRequestHandler(verifyEmailController))
 
 /**
  * Description.submid email to reset password, sen email to user
@@ -46,7 +55,7 @@ usersRouter.get('/verify-email', emailVerifyTokenValidator, wrapRequestHandler(v
  * Method: POST
  * body: {email: string}
  */
-usersRouter.post(
+authRouter.post(
   '/send-otp-forgot-password',
   sendOtpForgotPasswordValidator,
   wrapRequestHandler(forgotPasswordController.requestOTP)
@@ -58,7 +67,7 @@ usersRouter.post(
  * Method: POST
  * body: {email: string}
  */
-usersRouter.post(
+authRouter.post(
   '/verify-otp-forgot-password',
   verifyOtpForgotPasswordValidator,
   wrapRequestHandler(forgotPasswordController.verifyOTP)
@@ -70,4 +79,12 @@ usersRouter.post(
  * Method: POST
  * body: {email: string}
  */
-usersRouter.put('/reset-password', resetPasswordValidator, wrapRequestHandler(forgotPasswordController.resetPassword))
+authRouter.put('/reset-password', resetPasswordValidator, wrapRequestHandler(forgotPasswordController.resetPassword))
+
+/**
+ * Description.logout user
+ * Path: /logout
+ * Method: POST
+ * body: {refresh_token: string}
+ */
+authRouter.put('/logout', refreshTokenValidator, wrapRequestHandler(forgotPasswordController.resetPassword))

@@ -13,7 +13,7 @@ class MailService {
       }
     })
 
-    const verificationLink = `http://localhost:4000/users/verify-email?token=${emailVerifyToken}`
+    const verificationLink = `http://localhost:4000/api/auth/verify-email?token=${emailVerifyToken}`
 
     const mailOptions = {
       from: envConfig.emailUsername,

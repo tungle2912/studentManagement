@@ -10,7 +10,7 @@ interface OtpsType {
   expires_at?: number
 }
 
-export default class Otps {
+export default class Otp {
   _id?: ObjectId
   user_id: ObjectId
   otp: string

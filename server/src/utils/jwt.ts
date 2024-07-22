@@ -1,5 +1,5 @@
 import jwt, { SignOptions } from 'jsonwebtoken'
-import { TokenPayload } from '~/models/requests/User.requests'
+import { TokenPayload } from '~/models/requests/auth.requests'
 
 export const signToken = ({
   payload,
