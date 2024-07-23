@@ -1,9 +1,9 @@
-
+import { student } from './student'
 import { user } from './users'
 
-export interface SuccessResponse<TData> {
+export interface Response<TData> {
   message: string
-  data: TData
+  result: TData
 }
 
 export interface ErrorResponse<TData> {
@@ -11,12 +11,18 @@ export interface ErrorResponse<TData> {
   data?: TData
 }
 
-export type RefreshTokenResponse = SuccessResponse<{
+export type RefreshTokenResponse = Response<{
   access_token: string
 }>
 
-export type AuthResponse = SuccessResponse<{
+export type AuthResponse = Response<{
   refresh_token: string
   access_token: string
   user: user
+}>
+export type GetAllStudentResponse = Response<{
+  limit: number
+  page: number
+  total_pages: number
+  students: student[]
 }>

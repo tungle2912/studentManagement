@@ -1,53 +1,37 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button, Form, message } from 'antd'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
-import axios from '../../../api/axios'
 import Tittle from '../../../common/Tittle'
 import Input from '../../../components/Input'
-import { RoleType } from '../../../constants/enums'
+import { privateAdminRoutes } from '../../../config/admin.routes'
+import { privateUserRoutes } from '../../../config/users.routes'
+import { LoginValues, RoleType } from '../../../constants/enums'
+import { useLoginMutation } from '../../../hooks/data/auth.data'
 import { rules } from '../../../lib/rules'
-import {
-  isAdminRoute,
-  setAccessTokenToLocalCookie,
-  setRefreshTokenToCookie,
-  setRoleToLocalCookie
-} from '../../../lib/utils'
+
+import { isAdminRoute } from '../../../lib/utils'
 import styles from './style.module.scss'
-import useAuth from '../../../hooks/data/useAuth'
 
 function Login() {
   const [form] = Form.useForm()
   const location = useLocation()
-  const { setIsAuthenticated } = useAuth() // Thêm setIsAuthenticated
-  const navigate = useNavigate() // Thêm useNavigate
+  const navigate = useNavigate()
   const isAdminLogin = isAdminRoute(location.pathname)
-  const params = new URLSearchParams(window.location.search)
-  const email = params.get('email')
-  if (email) {
-    form.setFieldsValue({ email })
-  }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onFinish = async (values: any) => {
-    const url = isAdminLogin ? '/admin/login' : 'users/login'
+
+  const loginMutation = useLoginMutation()
+  const handleLogin = async (values: LoginValues) => {
     try {
-      const response = await axios.post(url, values)
-      const { access_token, refresh_token, role } = response.data.result
-      setRefreshTokenToCookie(refresh_token)
-      setAccessTokenToLocalCookie(access_token)
-      setRoleToLocalCookie(role)
-      setIsAuthenticated(true)
-      message.success('Login successful!')
-      if (role == RoleType.User) {
-        console.log('navigate to /')
-        setTimeout(() => {
-          navigate('/')
-        }, 1000)
+      let UrlNavigate = ''
+      if (isAdminLogin) {
+        values.role = RoleType.Admin
+        UrlNavigate = privateAdminRoutes.dashboard
       } else {
-        setTimeout(() => {
-          console.log('navigate to /admin')
-          navigate('/admin')
-        }, 1000)
+        values.role = RoleType.User
+        UrlNavigate = privateUserRoutes.home
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const response = await loginMutation.mutateAsync(values)
+      navigate(UrlNavigate, { replace: true })
+      message.success(response?.data?.message)
     } catch (error: any) {
       const errorEmailMessage = error.response?.data?.errors?.email?.msg
       if (errorEmailMessage != '') {
@@ -60,7 +44,6 @@ function Login() {
       }
     }
   }
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onFinishFailed = (errorInfo: any) => {
     console.log('Failed:', errorInfo)
@@ -70,17 +53,9 @@ function Login() {
     <div className={styles.loginContainer}>
       <div className={styles.loginForm}>
         <div className={styles.loginFormHeader}>
-          <Tittle className={styles.loginFormTittle} text='CURD OPERATION' />
+          <Tittle className={styles.loginFormTittle} text='CRUD OPERATION' />
           <span className={styles.loginSignIn}>SIGN IN</span>
           <p className={styles.loginDescription}>Enter your credentials to access your account</p>
-          <button
-            onClick={() => {
-              navigate('/admin')
-              console.log('navigate to /admin')
-            }}
-          >
-            a
-          </button>
         </div>
         <Form
           className={styles.loginFormContent}
@@ -91,7 +66,7 @@ function Login() {
           initialValues={{
             remember: true
           }}
-          onFinish={onFinish}
+          onFinish={handleLogin}
           onFinishFailed={onFinishFailed}
         >
           <Input
@@ -110,7 +85,12 @@ function Login() {
             rules={rules.password}
           />
           <Form.Item>
-            <Button className={styles.loginFormButton} type='primary' htmlType='submit'>
+            <Button
+              className={styles.loginFormButton}
+              type='primary'
+              htmlType='submit'
+               loading={loginMutation.isPending}
+            >
               SIGN IN
             </Button>
           </Form.Item>

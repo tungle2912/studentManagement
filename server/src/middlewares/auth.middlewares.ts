@@ -219,7 +219,7 @@ export const refreshTokenValidator = validate(
               const [decoded_refresh_token, refresh_token] = await Promise.all([
                 verifyToken({ token: value, secretOrPublicKey: process.env.JWT_SECRET_REFRESH_TOKEN as string }),
                 databaseService.refreshTokens.findOne({ token: value })
-              ])           
+              ])
               if (refresh_token === null) {
                 throw new ErrorWithStatus({
                   message: AUTH_MESSAGES.REFRESH_TOKEN_NOT_EXIST,

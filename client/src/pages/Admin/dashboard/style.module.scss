@@ -1,3 +1,4 @@
+@import '../../../styles/variable'; 
 .homeContainer{
   display: flex;
   align-items: center; 
@@ -5,7 +6,7 @@
   padding-left: 15px;
 }
 .student{
-  background-color:  #F0F9FF;
+  background-color: $ligt-blue;
 }
 .Course{
   background: #FEF6FB;

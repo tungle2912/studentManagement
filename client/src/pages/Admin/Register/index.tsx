@@ -1,30 +1,24 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button, Form, message } from 'antd'
-import Input from '../../../components/Input'
-import axios from '../../../api/axios'
-import Tittle from '../../../common/Tittle'
-import styles from './style.module.scss'
 import { NavLink } from 'react-router-dom'
-import { useState } from 'react'
+import Tittle from '../../../common/Tittle'
+import Input from '../../../components/Input'
+import { RegisterValues } from '../../../constants/enums'
+import { useRegisterMutation } from '../../../hooks/data/auth.data'
 import { rules } from '../../../lib/rules'
+import styles from './style.module.scss'
 
 function Register() {
   const [form] = Form.useForm()
-  const [loading, setLoading] = useState(false) // State để quản lý loading
+  const registerMutation = useRegisterMutation()
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onFinish = async (values: any) => {
-    setLoading(true) // Bắt đầu hiển thị loading khi submit
+  const handleRegister = async (values: RegisterValues) => {
     try {
-      const response = await axios.post('/users/register', values)
-      console.log(response)
-      const msg = response.data.message
-      if (msg) {
-        message.success(msg)
-      }
-    } catch (error) {
-      const errorEmailMessage = // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (error as any).response?.data?.errors?.email?.msg
-      if (errorEmailMessage != '') {
+      const response = await registerMutation.mutateAsync(values)
+      message.success(response?.data?.message)
+    } catch (error: any) {
+      const errorEmailMessage = error.response?.data?.errors?.email?.msg
+      if (errorEmailMessage) {
         form.setFields([
           {
             name: 'email',
@@ -34,14 +28,13 @@ function Register() {
       } else {
         message.error('Register failed. Please check your inputs.')
       }
-    } finally {
-      setLoading(false) // Ẩn loading sau khi hoàn thành
     }
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   const onFinishFailed = (errorInfo: any) => {
     console.log('Failed:', errorInfo)
   }
+
   return (
     <div className={styles.loginContainer}>
       <div className={styles.loginForm}>
@@ -58,7 +51,7 @@ function Register() {
           initialValues={{
             remember: true
           }}
-          onFinish={onFinish}
+          onFinish={handleRegister}
           onFinishFailed={onFinishFailed}
         >
           <Input name='email' label='Email' placeholder='Enter your email' rules={rules.email} />
@@ -72,12 +65,17 @@ function Register() {
           <Input
             type='password'
             name='confirm_password'
-            label='confirm_password'
-            placeholder='Enter your password'
+            label='Confirm Password'
+            placeholder='Confirm your password'
             rules={rules.confirm_password}
           />
           <Form.Item>
-            <Button className={styles.loginFormButton} type='primary' htmlType='submit' loading={loading}>
+            <Button
+              className={styles.loginFormButton}
+              type='primary'
+              htmlType='submit'
+              loading={registerMutation.isPending}
+            >
               SIGN UP
             </Button>
           </Form.Item>

@@ -2,6 +2,7 @@ import { Router } from 'express'
 import {
   forgotPasswordController,
   loginController,
+  logoutController,
   refreshTokenController,
   registerController,
   verifyEmailController
@@ -87,4 +88,4 @@ authRouter.put('/reset-password', resetPasswordValidator, wrapRequestHandler(for
  * Method: POST
  * body: {refresh_token: string}
  */
-authRouter.put('/logout', refreshTokenValidator, wrapRequestHandler(forgotPasswordController.resetPassword))
+authRouter.delete('/logout', wrapRequestHandler(logoutController))

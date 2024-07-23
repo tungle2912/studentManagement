@@ -9,7 +9,7 @@ import { useEffect } from 'react'
 
 type Props = {
   className?: string
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
+  setIsOpen?: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const handleLogout = async () => {
@@ -26,7 +26,7 @@ function Sidebar(props: Props) {
   const { setIsOpen } = props
 
   const closeNavBar = () => {
-    if (window.innerWidth < 768) {
+    if (window.innerWidth < 768 && setIsOpen) {
       setIsOpen(false)
     }
   }

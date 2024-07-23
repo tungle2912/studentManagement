@@ -5,7 +5,8 @@ import {
   isAxiosExpiredAccessTokenError,
   isAxiosUnauthorizedError,
   removeAuthFromCookie,
-  setAccessTokenToLocalCookie
+  setAccessTokenToLocalCookie,
+  setRefreshTokenToCookie
 } from '../lib/utils'
 import { RefreshTokenResponse } from '../types/reponses'
 
@@ -42,16 +43,12 @@ class Request {
       (response) => {
         const { url } = response.config
         console.log('URL: ', url)
-        if (url === '/users/logout') {
-          removeAuthFromCookie()
-        }
         return response
       },
       (error: AxiosError) => {
         if (isAxiosUnauthorizedError(error)) {
           const config = error.response?.config || ({ headers: {} } as InternalAxiosRequestConfig)
           const { url } = config
-
           if (
             isAxiosExpiredAccessTokenError<{
               message: string
@@ -60,7 +57,6 @@ class Request {
             url !== 'refresh-token'
           ) {
             this.refreshTokenRequest = this.refreshTokenRequest ? this.refreshTokenRequest : this.handleRefreshToken()
-
             return this.refreshTokenRequest
               .then(() => {
                 // Tiếp tục request cũ
@@ -83,14 +79,15 @@ class Request {
   }
   private handleRefreshToken() {
     return this.instance
-      .post<RefreshTokenResponse>('/auth/refresh-token', {
+      .post<RefreshTokenResponse>('/api/auth/refresh-token', {
         refresh_token: this.refreshToken
       })
       .then((res) => {
-        const { access_token } = res.data.data
+        const { access_token, refresh_token } = res.data.data as { access_token: string; refresh_token: string; }
         console.log('refresh', access_token)
         this.accessToken = access_token
         setAccessTokenToLocalCookie(access_token)
+        setRefreshTokenToCookie(refresh_token)
         return this.accessToken
       })
       .catch((error) => {

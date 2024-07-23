@@ -2,7 +2,7 @@ import { Navigate, Outlet, useLocation, useRoutes } from 'react-router-dom'
 import './App.css'
 import { privateAdminRoutes, publicAdminRoutes } from './config/admin.routes'
 import { privateUserRoutes, publicUserRoutes } from './config/users.routes'
-import useAuth from './hooks/data/useAuth'
+import useAuth from './hooks/useAuth'
 import AuthLayout from './layouts/AuthLayout'
 import MainLayout from './layouts/MainLayout'
 import { isAdminRoute } from './lib/utils'
@@ -15,12 +15,13 @@ import Register from './pages/Admin/register'
 import Report from './pages/Admin/report'
 import Settings from './pages/Admin/settings'
 import Students from './pages/Admin/students'
+import Sidebar from './components/SideBar'
+import UpdateStudent from './pages/Admin/updatestudent'
 
 function ProtectedRoute() {
   const { isAuthenticated } = useAuth()
   const location = useLocation()
   const isAdmin = isAdminRoute(location.pathname)
-  console.log('ProtectedRoute', isAuthenticated)
   return isAuthenticated ? (
     <Outlet />
   ) : (
@@ -89,6 +90,22 @@ function App() {
           )
         },
         {
+          path: privateAdminRoutes.addstudent,
+          element: (
+            <MainLayout>
+              <UpdateStudent />
+            </MainLayout>
+          )
+        },
+        {
+          path: privateAdminRoutes.editStudent,
+          element: (
+            <MainLayout>
+              <UpdateStudent />
+            </MainLayout>
+          )
+        },
+        {
           path: privateAdminRoutes.settings,
           element: (
             <MainLayout>
@@ -118,7 +135,11 @@ function App() {
       children: [
         {
           path: '',
-          element: <div>Home</div>
+          element: (
+            <AuthLayout>
+              <Sidebar />
+            </AuthLayout>
+          )
         }
       ]
     },
