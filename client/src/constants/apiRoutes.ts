@@ -12,7 +12,7 @@ export const AUTH_ROUTES = {
 
 export const ADMIN_ROUTES = {
   DASHBOARD: `${API_BASE_URL}/admin/dashboard`,
-  CREATE_USER: `${API_BASE_URL}/admin/create-user`,
+  ADD_STUDENT: `${API_BASE_URL}/admin/students/add`,
   DELETE_USER: `${API_BASE_URL}/admin/delete-user`
 }
 

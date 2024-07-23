@@ -1,21 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
 import { authApi } from '../../api/auth.api'
-import { setAccessTokenToLocalCookie, setRefreshTokenToCookie, setRoleToLocalCookie } from '../../lib/utils'
-import useAuth from '../useAuth'
-
 export const useLoginMutation = () => {
-  const { setIsAuthenticated } = useAuth()
-  return useMutation({
-    mutationFn: authApi.login,
-    onSuccess: (data) => {
-      const { access_token, refresh_token, role } = data?.data?.result ?? {}
-      setRefreshTokenToCookie(refresh_token)
-      setAccessTokenToLocalCookie(access_token)
-      setRoleToLocalCookie(role)
-      setIsAuthenticated(true)
-    },
-    onError: () => {}
-  })
+  return useMutation({ mutationFn: authApi.login })
 }
 export const useRegisterMutation = () => {
   return useMutation({ mutationFn: authApi.register })
@@ -34,4 +20,7 @@ export const useVerifyOtpForgotPasswordMutation = () => {
 }
 export const useResetPasswordMutation = () => {
   return useMutation({ mutationFn: authApi.resetPassword })
+}
+export const useAddStudentMutation = () => {
+  return useMutation({ mutationFn: authApi.addStudent })
 }

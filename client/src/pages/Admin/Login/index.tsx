@@ -8,41 +8,51 @@ import { privateUserRoutes } from '../../../config/users.routes'
 import { LoginValues, RoleType } from '../../../constants/enums'
 import { useLoginMutation } from '../../../hooks/data/auth.data'
 import { rules } from '../../../lib/rules'
+import { setAccessTokenToLocalCookie, setRefreshTokenToCookie, setRoleToLocalCookie } from '../../../lib/utils'
 
 import { isAdminRoute } from '../../../lib/utils'
 import styles from './style.module.scss'
+import useAuth from '../../../hooks/useAuth'
 
 function Login() {
   const [form] = Form.useForm()
   const location = useLocation()
   const navigate = useNavigate()
+  const { setIsAuthenticated } = useAuth()
   const isAdminLogin = isAdminRoute(location.pathname)
 
   const loginMutation = useLoginMutation()
   const handleLogin = async (values: LoginValues) => {
-    try {
-      let UrlNavigate = ''
-      if (isAdminLogin) {
-        values.role = RoleType.Admin
-        UrlNavigate = privateAdminRoutes.dashboard
-      } else {
-        values.role = RoleType.User
-        UrlNavigate = privateUserRoutes.home
-      }
-      const response = await loginMutation.mutateAsync(values)
-      navigate(UrlNavigate, { replace: true })
-      message.success(response?.data?.message)
-    } catch (error: any) {
-      const errorEmailMessage = error.response?.data?.errors?.email?.msg
-      if (errorEmailMessage != '') {
-        form.setFields([
-          {
-            name: 'email',
-            errors: [errorEmailMessage]
-          }
-        ])
-      }
+    let UrlNavigate = ''
+    if (isAdminLogin) {
+      values.role = RoleType.Admin
+      UrlNavigate = privateAdminRoutes.dashboard
+    } else {
+      values.role = RoleType.User
+      UrlNavigate = privateUserRoutes.home
     }
+    const response = await loginMutation.mutateAsync(values, {
+      onSuccess(data) {
+        const { access_token, refresh_token, role } = data?.data?.result ?? {}
+        setRefreshTokenToCookie(refresh_token)
+        setAccessTokenToLocalCookie(access_token)
+        setRoleToLocalCookie(role)
+        setIsAuthenticated(true)
+        navigate(UrlNavigate, { replace: true })
+        message.success(response?.data?.message)
+      },
+      onError(error: any) {
+        const errorEmailMessage = error?.response?.data?.errors?.email?.msg
+        if (errorEmailMessage != '') {
+          form.setFields([
+            {
+              name: 'email',
+              errors: [errorEmailMessage]
+            }
+          ])
+        }
+      }
+    })
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onFinishFailed = (errorInfo: any) => {
@@ -89,7 +99,7 @@ function Login() {
               className={styles.loginFormButton}
               type='primary'
               htmlType='submit'
-               loading={loginMutation.isPending}
+              loading={loginMutation.isPending}
             >
               SIGN IN
             </Button>

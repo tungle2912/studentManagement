@@ -1,9 +1,10 @@
 export type student = {
+  avatar: any
   id: number
   name: string
   email: string
   phone: string
-  enrollNumber: string
-  dateOfAdmission: string
-  avatar: string
+  enroll_number: string
+  date_of_admission: string
+  image: string
 }

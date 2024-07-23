@@ -1,4 +1,4 @@
-import { AUTH_ROUTES } from '../constants/apiRoutes'
+import { ADMIN_ROUTES, AUTH_ROUTES } from '../constants/apiRoutes'
 import { RoleType } from '../constants/enums'
 import request from './axios'
 
@@ -23,5 +23,8 @@ export const authApi = {
   },
   resetPassword: (values: { email: string; password: string; otp_id: string }) => {
     return request.put(AUTH_ROUTES.RESET_PASSWORD, values)
+  },
+  addStudent: (values: FormData) => {
+    return request.post(ADMIN_ROUTES.ADD_STUDENT, values, { headers: { 'Content-Type': 'multipart/form-data' } })
   }
 }

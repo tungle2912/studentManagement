@@ -3,6 +3,7 @@ import Cookies from 'js-cookie'
 import HTTP_RESPONSE_STATUS_CODES from '../constants/httpStatus'
 import { ErrorResponse } from '../types/reponses'
 
+
 export const formatNumber = (number: number) => new Intl.NumberFormat().format(number)
 
 export const isAxiosError = <T>(error: unknown): error is AxiosError<T> => {
@@ -67,4 +68,7 @@ export const removeAuthFromCookie = () => {
 }
 export const isAdminRoute = (pathname: string) => {
   return pathname.includes('/admin')
+}
+export const handleError = (error: AxiosError) => {
+  console.log(error)
 }

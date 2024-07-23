@@ -2,7 +2,6 @@ import { Pagination, Table, TableColumnsType } from 'antd'
 import { createSearchParams, useNavigate, useSearchParams } from 'react-router-dom'
 import pen from '../../assets/icons/pen.svg'
 import trash from '../../assets/icons/trash.svg'
-import avt from '../../assets/images'
 import { privateAdminRoutes } from '../../config/admin.routes'
 import { student } from '../../types/student'
 import styles from './style.module.scss'
@@ -24,13 +23,10 @@ function TableStudent({ dataSource }: TableStudentProps) {
       title: '',
       dataIndex: 'avatar',
       render: (text, record) => {
-        const avatarSrc = avt[record.avatar.replace('./assets/images/', '')]
+        const avatarSrc = `http://localhost:4000/admin/students/${record.avatar}`;
+        console.log(avatarSrc)
         return (
-          <img
-            src={avatarSrc}
-            alt={record.name}
-            style={{ height: '55px', width: '65px', objectFit: 'cover', borderRadius: '8px' }}
-          />
+          <img src={avatarSrc} style={{ height: '55px', width: '65px', objectFit: 'cover', borderRadius: '8px' }} />
         )
       }
     },
@@ -52,11 +48,11 @@ function TableStudent({ dataSource }: TableStudentProps) {
     },
     {
       title: 'Enroll Number',
-      dataIndex: 'enrollNumber'
+      dataIndex: 'enroll_number'
     },
     {
       title: 'Date Of Admission',
-      dataIndex: 'dateOfAdmission'
+      dataIndex: 'date_of_admission'
     },
     {
       title: '',

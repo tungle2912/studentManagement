@@ -5,9 +5,9 @@ interface Props {
   text: string
   className?: string
 }
-function index({ text, className }: Props) {
+function Tittle({ text, className }: Props) {
   const tittleClass = `${styles.tittle} ${className}`
   return <div className={tittleClass}>{text}</div>
 }
 
-export default index
+export default Tittle

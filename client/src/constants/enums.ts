@@ -30,6 +30,15 @@ export interface RegisterValues {
   password: string
   confirm_password: string
 }
+export interface UpdateStudentValus{
+  name: string
+  email: string
+  phone: string
+  enroll_number: string
+  date_of_admission: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  image: any
+}
 export interface VerifyEmailValues {
   email_verify_token: string
 }

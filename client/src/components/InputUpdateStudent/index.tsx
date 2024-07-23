@@ -13,7 +13,7 @@ interface InputProps {
   type?: 'password' | 'text' 
 }
 
-function Input({
+function InputUpdateStudent({
   name,
   placeholder,
   label,
@@ -36,4 +36,4 @@ function Input({
   )
 }
 
-export default Input
+export default InputUpdateStudent

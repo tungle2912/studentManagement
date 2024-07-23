@@ -6,7 +6,7 @@ interface Props {
   onClick?(): void
 }
 
-function index({ text, className, onClick }: Props) {
+function button({ text, className, onClick }: Props) {
   const inputContainerButtonClass = `${styles.inputContainerButton} ${className}`
   return (
     <button onClick={onClick} className={inputContainerButtonClass}>
@@ -15,4 +15,4 @@ function index({ text, className, onClick }: Props) {
   )
 }
 
-export default index
+export default button
