@@ -37,7 +37,6 @@ export const handleUploadImage = async (req: Request) => {
       }
       req.body = fields // Lưu dữ liệu từ form vào req.body
       req.files = files // Lưu tệp từ form vào req.files
-      console.log(files)
       // eslint-disable-next-line no-extra-boolean-cast
       if (!Boolean(files.image)) {
         return reject(new Error('File is empty'))

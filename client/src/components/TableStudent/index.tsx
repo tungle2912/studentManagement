@@ -1,4 +1,4 @@
-import { Pagination, Table, TableColumnsType } from 'antd'
+import { Image, Pagination, Table, TableColumnsType } from 'antd'
 import { createSearchParams, useNavigate, useSearchParams } from 'react-router-dom'
 import pen from '../../assets/icons/pen.svg'
 import trash from '../../assets/icons/trash.svg'
@@ -23,10 +23,10 @@ function TableStudent({ dataSource }: TableStudentProps) {
       title: '',
       dataIndex: 'avatar',
       render: (text, record) => {
-        const avatarSrc = `http://localhost:4000/admin/students/${record.avatar}`;
+        const avatarSrc = `http://localhost:4000/admin/students/${record.avatar}`
         console.log(avatarSrc)
         return (
-          <img src={avatarSrc} style={{ height: '55px', width: '65px', objectFit: 'cover', borderRadius: '8px' }} />
+          <Image src={avatarSrc} style={{ height: '55px', width: '65px', objectFit: 'cover', borderRadius: '8px' }} />
         )
       }
     },
@@ -56,16 +56,20 @@ function TableStudent({ dataSource }: TableStudentProps) {
     },
     {
       title: '',
-      dataIndex: 'actions',
-      render: () => (
+      dataIndex: '_id',
+      render: (id) => (
         <div style={{ display: 'flex' }}>
-          <img src={pen} style={{ marginRight: '33px', cursor: 'pointer' }} alt='Edit' onClick={() => {}} />
+          <img
+            src={pen}
+            style={{ marginRight: '33px', cursor: 'pointer' }}
+            alt='Edit'
+            onClick={() => navigate(`${privateAdminRoutes.students}/edit/${id}`)}
+          />
           <img src={trash} style={{ cursor: 'pointer' }} alt='Delete' onClick={() => {}} />
         </div>
       )
     }
   ]
-
   const onPaginationChange = (page: number) => {
     navigate({
       pathname: privateAdminRoutes.students,

@@ -28,7 +28,7 @@ class AdminService {
     const newName = getNameFromFullname(file.newFilename)
     const newPath = path.resolve(UPLOAD_IMAGE_DIR, `${newName}.jpg`)
     await sharp(file.filepath).jpeg().toFile(newPath)
-    //  fs.promises.unlink(file.filepath)
+  //  fs.promises.unlink(file.filepath)
     return `${newName}.jpg`
   }
   async addStudent({ req, url }: { req: Request; url: string }) {
@@ -48,6 +48,10 @@ class AdminService {
     })
     await databaseService.students.insertOne(newStudent)
     return newStudent
+  }
+  async getStudentById (studentId: string) {
+    const student = await databaseService.students.findOne({ _id: new ObjectId(studentId) })
+    return student 
   }
 }
 const adminService = new AdminService()

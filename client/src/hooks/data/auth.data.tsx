@@ -21,6 +21,3 @@ export const useVerifyOtpForgotPasswordMutation = () => {
 export const useResetPasswordMutation = () => {
   return useMutation({ mutationFn: authApi.resetPassword })
 }
-export const useAddStudentMutation = () => {
-  return useMutation({ mutationFn: authApi.addStudent })
-}

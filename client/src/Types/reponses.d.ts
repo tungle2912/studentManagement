@@ -26,3 +26,4 @@ export type GetAllStudentResponse = Response<{
   total_pages: number
   students: student[]
 }>
+export type GetStudentByIdResponse = Response<student>

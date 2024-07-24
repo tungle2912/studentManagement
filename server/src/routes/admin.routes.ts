@@ -1,14 +1,18 @@
 import { Router } from 'express'
-import { addStudentController, getStudentsController } from '~/controllers/admin.controllers'
 import {
-  addStudentValidator,
-  adminValidator,
-  handleRequest,
-  paginationValidator
-} from '~/middlewares/admin.middlewares'
+  addStudentController,
+  editStudentController,
+  getALLStudentsController,
+  getStudentByIdController
+} from '~/controllers/admin.controllers'
+import { adminValidator, paginationValidator } from '~/middlewares/admin.middlewares'
 import { wrapRequestHandler } from '~/utils/handlers'
 export const adminRouter = Router()
 
-adminRouter.get('/students', adminValidator, paginationValidator, wrapRequestHandler(getStudentsController))
+adminRouter.get('/students', adminValidator, paginationValidator, wrapRequestHandler(getALLStudentsController))
 
-adminRouter.post('/students/add', adminValidator, wrapRequestHandler(addStudentController))
+adminRouter.post('/student/add', adminValidator, wrapRequestHandler(addStudentController))
+
+adminRouter.get('/student/:studentId', adminValidator, wrapRequestHandler(getStudentByIdController))
+
+adminRouter.put('/student/edit/:studentId', adminValidator, wrapRequestHandler(editStudentController))
