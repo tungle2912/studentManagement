@@ -22,13 +22,13 @@ export const handleUploadImage = async (req: Request) => {
     maxFiles: 1,
     keepExtensions: true,
     maxFileSize: 3000 * 1024, // 300KB
-    filter: function ({ name, originalFilename, mimetype }) {
-      const valid = name === 'image' && Boolean(mimetype?.startsWith('image/'))
-      if (!valid) {
-        form.emit('error' as any, new Error('File type is not valid') as any)
-      }
-      return valid
-    }
+    // filter: function ({ name, originalFilename, mimetype }) {
+    //   const valid = name === 'image' && Boolean(mimetype?.startsWith('image/'))
+    //   if (!valid) {
+    //     form.emit('error' as any, new Error('File type is not valid') as any)
+    //   }
+    //   return valid
+    // }
   })
   return new Promise<File>((resolve, reject) => {
     form.parse(req, (err, fields, files) => {

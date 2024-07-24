@@ -23,12 +23,15 @@ class AdminService {
       students
     }
   }
-  async uploadImage(req: Request) {
-    const file = await handleUploadImage(req)
+  async uploadImage(file: any) {
     const newName = getNameFromFullname(file.newFilename)
     const newPath = path.resolve(UPLOAD_IMAGE_DIR, `${newName}.jpg`)
     await sharp(file.filepath).jpeg().toFile(newPath)
-  //  fs.promises.unlink(file.filepath)
+    // try {
+    //   fs.unlinkSync(file.filepath);
+    // } catch (error) {
+    //   console.log('err', error)
+    // }
     return `${newName}.jpg`
   }
   async addStudent({ req, url }: { req: Request; url: string }) {
@@ -49,9 +52,51 @@ class AdminService {
     await databaseService.students.insertOne(newStudent)
     return newStudent
   }
-  async getStudentById (studentId: string) {
+  async editStudent({ studentId, data, urlImage }: { studentId: string; data: Student; urlImage: string }) {
+    if (urlImage == '') {
+      await databaseService.students.updateOne({ _id: new ObjectId(studentId) }, [
+        {
+          $set: {
+            name: data.name,
+            email: data.email,
+            phone: data.phone,
+            enroll_number: data.enroll_number,
+            date_of_admission: data.date_of_admission
+          }
+        }
+      ])
+    } else {
+      await databaseService.students.updateOne({ _id: new ObjectId(studentId) }, [
+        {
+          $set: {
+            name: data.name,
+            email: data.email,
+            phone: data.phone,
+            enroll_number: data.enroll_number,
+            date_of_admission: data.date_of_admission,
+            avatar: urlImage
+          }
+        }
+      ])
+    }
+
+    // const newStudent = new Student({
+    //   name: data.name,
+    //   email: data.email,
+    //   phone: data.phone,
+    //   enroll_number: data.enroll_number,
+    //   date_of_admission: data.date_of_admission,
+    //   avatar: data.avatar
+    // })
+    // await databaseService.students.insertOne(newStudent)
+    // return newStudent
+  }
+  async getStudentById(studentId: string) {
     const student = await databaseService.students.findOne({ _id: new ObjectId(studentId) })
-    return student 
+    return student
+  }
+  async deleteStudent(studentId: string) {
+    await databaseService.students.deleteOne({ _id: new ObjectId(studentId) })
   }
 }
 const adminService = new AdminService()

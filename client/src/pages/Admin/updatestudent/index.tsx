@@ -22,6 +22,7 @@ function UpdateStudent() {
   const navigate = useNavigate()
   const [form] = Form.useForm()
   const [isAdd, setIsAdd] = useState(true)
+  const [tittile, setTittle] = useState('Add New Student')
   const studentData = useGetStudentByIdQuery({ studentId: id || '', enabled: Boolean(id) })
   const [fileList, setFileList] = useState<UploadFile[]>([])
 
@@ -29,6 +30,7 @@ function UpdateStudent() {
     if (studentData.data) {
       const data = studentData?.data?.data?.result
       setIsAdd(false)
+      setTittle('Edit Student')
       console.log('data', data)
       const fileExits = {
         uid: '-1',
@@ -50,22 +52,21 @@ function UpdateStudent() {
       setFileList([fileExits])
     }
   }, [studentData?.data])
+
   const editStudentMutation = useEditStudentMutation()
   const handleEditStudent = async (values: UpdateStudentValus) => {
     console.log('edit')
     console.log('value', values)
     const formData = new FormData()
-    if (values.image && values.image.file) {
+    if (values.image.file.originFileObj) {
       formData.append('image', values.image.file.originFileObj)
-    } else if (fileList.length > 0 && fileList[0].originFileObj) {
-      // Nếu không có ảnh mới, sử dụng ảnh từ fileList nếu có
     }
+    console.log('img', values.image.file.originFileObj)
     formData.append('name', values.name)
     formData.append('email', values.email)
     formData.append('phone', values.phone)
     formData.append('enroll_number', values.enroll_number)
     formData.append('date_of_admission', formatDate(values.date_of_admission))
-    console.log('data', formData.getAll)
     const studentId = id?.toString() || ''
     await editStudentMutation.mutateAsync(
       { data: formData, studentId: studentId },
@@ -103,6 +104,7 @@ function UpdateStudent() {
       }
     })
   }
+
   const submit = isAdd ? handleAddStudent : handleEditStudent
 
   const dummyRequest = async ({ onSuccess }: any) => {
@@ -113,7 +115,7 @@ function UpdateStudent() {
 
   return (
     <div className={styles.updateStudentContainer}>
-      <Tittle className={styles.tittleUpdateStudent} text='Add New Student'></Tittle>
+      <Tittle className={styles.tittleUpdateStudent} text={tittile}></Tittle>
       <Form
         form={form}
         onFinish={submit}
@@ -131,6 +133,7 @@ function UpdateStudent() {
         </Form.Item>
         <Form.Item label='Avatar' name='image'>
           <Upload
+            maxCount={1}
             fileList={fileList}
             onChange={({ fileList }) => {
               console.log(fileList)

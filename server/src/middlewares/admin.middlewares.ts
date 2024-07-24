@@ -4,12 +4,14 @@ import { envConfig } from '~/constants/config'
 import { RoleType } from '~/constants/enums'
 import { NextFunction, Request, Response } from 'express'
 import HTTP_STATUS from '~/constants/httpStatus'
+import { File } from 'formidable'
 import { AUTH_MESSAGES } from '~/constants/messages'
 import { ErrorWithStatus } from '~/models/Errors'
 import databaseService from '~/services/database.services'
 import { verifyToken } from '~/utils/jwt'
 import { validate } from '~/utils/validation'
 import formidable from 'formidable'
+import { UPLOAD_IMAGE_TEMP_DIR } from '~/constants/dir'
 const form = formidable({})
 export const adminValidator = validate(
   checkSchema(
@@ -107,22 +109,40 @@ export const addStudentValidator = validate(
     ['body']
   )
 )
+
 export const handleRequest = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // Sử dụng Promise để chờ form.parse hoàn tất
-    const fields = await new Promise<Record<string, any>>((resolve, reject) => {
+    const form = formidable({
+      uploadDir: UPLOAD_IMAGE_TEMP_DIR,
+      maxFiles: 1,
+      keepExtensions: true,
+      maxFileSize: 3000 * 1024 // 300KB
+      // filter: function ({ name, originalFilename, mimetype }) {
+      //   const valid = name === 'image' && Boolean(mimetype?.startsWith('image/'))
+      //   if (!valid) {
+      //     form.emit('error' as any, new Error('File type is not valid') as any)
+      //   }
+      //   return valid
+      // }
+    })
+    const result = await new Promise<any>((resolve, reject) => {
       form.parse(req, (err, fields, files) => {
         if (err) {
-          reject(err)
-        } else {
-          resolve(fields)
+          return reject(err)
         }
+        console.log('432')
+        req.files = files // Lưu tệp từ form vào req.files
+        // eslint-disable-next-line no-extra-boolean-cast
+        // if (!Boolean(files.image)) {
+        //   return reject(new Error('File is empty'))
+        // }
+        resolve({ files, fields })
       })
     })
-
     // Chuyển đổi các giá trị từ mảng thành chuỗi
     const processedFields: Record<string, string> = {}
-    for (const [key, value] of Object.entries(fields)) {
+    for (const [key, value] of Object.entries(result.fields)) {
       processedFields[key] = Array.isArray(value) ? value[0] : (value as string)
     }
 

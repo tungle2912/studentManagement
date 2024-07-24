@@ -1,8 +1,9 @@
-import { Image, Pagination, Table, TableColumnsType } from 'antd'
+import { Image, message, Pagination, Popconfirm, Table, TableColumnsType } from 'antd'
 import { createSearchParams, useNavigate, useSearchParams } from 'react-router-dom'
 import pen from '../../assets/icons/pen.svg'
 import trash from '../../assets/icons/trash.svg'
 import { privateAdminRoutes } from '../../config/admin.routes'
+import { useDeleteStudentMutation } from '../../hooks/data/students.data'
 import { student } from '../../types/student'
 import styles from './style.module.scss'
 
@@ -18,6 +19,39 @@ function TableStudent({ dataSource }: TableStudentProps) {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const params = Object.fromEntries([...searchParams])
+  const deleteStudentMutation = useDeleteStudentMutation()
+
+  const handleDeleteStudent = async ({ name, studentId }: { studentId: string; name: string }) => {
+    try {
+      await deleteStudentMutation.mutateAsync(studentId)
+      message.success(`Delete student ${name} successfully`)
+
+      // Check if we need to navigate to the previous page
+      const currentPage = Number(params.page) || 1
+      if (dataSource.students.length === 1 && currentPage > 1) {
+        // Navigate to the previous page if there are no students left on the current page
+        navigate({
+          pathname: privateAdminRoutes.students,
+          search: createSearchParams({
+            ...params,
+            page: String(currentPage - 1)
+          }).toString()
+        })
+      } else {
+        // Reload the current page
+        navigate({
+          pathname: privateAdminRoutes.students,
+          search: createSearchParams({
+            ...params,
+            page: String(currentPage)
+          }).toString()
+        })
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   const columns: TableColumnsType<student> = [
     {
       title: '',
@@ -57,7 +91,7 @@ function TableStudent({ dataSource }: TableStudentProps) {
     {
       title: '',
       dataIndex: '_id',
-      render: (id) => (
+      render: (id, record) => (
         <div style={{ display: 'flex' }}>
           <img
             src={pen}
@@ -65,7 +99,19 @@ function TableStudent({ dataSource }: TableStudentProps) {
             alt='Edit'
             onClick={() => navigate(`${privateAdminRoutes.students}/edit/${id}`)}
           />
-          <img src={trash} style={{ cursor: 'pointer' }} alt='Delete' onClick={() => {}} />
+
+          <Popconfirm
+            title='Delete the task'
+            placement='leftTop'
+            description='Are you sure to delete this task?'
+            onConfirm={() => handleDeleteStudent({ name: record.name, studentId: id })}
+            onCancel={() => {}}
+            okText='Yes'
+            cancelText='No'
+          >
+            {' '}
+            <img src={trash} style={{ cursor: 'pointer' }} alt='Delete' />
+          </Popconfirm>
         </div>
       )
     }

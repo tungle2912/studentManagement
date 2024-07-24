@@ -23,7 +23,7 @@ const studentsApi = {
     return request.post(ADMIN_ROUTES.ADD_STUDENT, values, { headers: { 'Content-Type': 'multipart/form-data' } })
   },
   deleteStudent: (studentId: string) => {
-    return request.delete(`/api/admin/students/${studentId}`)
+    return request.delete(`/api/admin/student/delete/${studentId}`)
   }
 }
 export default studentsApi
