@@ -1,0 +1,41 @@
+{
+  "language": "VI",
+  "welcome": "Chào mừng",
+  "nav_links": {
+    "Home": "Trang chủ",
+    "Course": "Khóa học",
+    "Students": "Học sinh",
+    "Payment": "Thanh toán",
+    "Report": "Báo cáo",
+    "Settings": "Cài đặt"
+  },
+  "buttons": {
+    "add_student": "Thêm học sinh mới",
+    "logout": "Đăng xuất"
+  },
+  "inputs": {
+    "search": {
+      "placeholder": "Tìm kiếm..."
+    },
+    "message": {}
+  },
+  "stats": {
+    "Students": "Học sinh",
+    "Course": "Khóa học",
+    "Payments": "Thanh toán",
+    "Users": "Người dùng"
+  },
+  "titlesTable": {
+    "name": "Tên",
+    "email": "Email",
+    "phone": "Số điện thoại",
+    "enroll_number": "Số ghi danh",
+    "date_of_admission": "Ngày nhập học"
+  },
+  "tittles": {
+    "students": "Danh sách học sinh",
+    "courses": "Khóa học",
+    "payments": "Thanh toán",
+    "users": "Người dùng"
+  }
+}

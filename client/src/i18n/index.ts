@@ -1,7 +1,6 @@
-
 import { initReactI18next } from 'react-i18next'
-import i18n from 'i18next';
-//import HttpApi from 'i18next-http-backend';
+import i18n from 'i18next'
+import HttpApi from 'i18next-http-backend'
 import I18nextBrowserLanguageDetector from 'i18next-browser-languagedetector'
 
 export const codes = {
@@ -10,6 +9,7 @@ export const codes = {
 }
 
 i18n
+  .use(HttpApi)
   .use(I18nextBrowserLanguageDetector)
   .use(initReactI18next)
   .init({
@@ -18,6 +18,7 @@ i18n
     interpolation: {
       escapeValue: false
     },
+    lng: codes.en,
     detection: {
       order: ['querystring', 'cookie', 'localStorage', 'sessionStorage', 'navigator', 'htmlTag', 'path', 'subdomain'],
       caches: ['cookie']

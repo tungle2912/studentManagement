@@ -10,7 +10,7 @@ type navLink = {
 export const navLinks: navLink[] = [
   {
     id: 1,
-    label: 'Home',
+    label: `Home`,
     to: privateAdminRoutes.dashboard,
     icon: icons.home
   },

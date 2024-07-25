@@ -151,7 +151,7 @@ export const handleRequest = async (req: Request, res: Response, next: NextFunct
         if (err) {
           return reject(err)
         }
-        console.log('432')
+
         req.files = files // Lưu tệp từ form vào req.files
         // eslint-disable-next-line no-extra-boolean-cast
         // if (!Boolean(files.image)) {

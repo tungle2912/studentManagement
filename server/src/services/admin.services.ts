@@ -1,12 +1,11 @@
 import { Request } from 'express'
-import fs from 'fs'
+import { ObjectId } from 'mongodb'
 import path from 'path'
 import sharp from 'sharp'
 import { UPLOAD_IMAGE_DIR } from '~/constants/dir'
-import { getNameFromFullname, handleUploadImage, processFields } from '~/utils/file'
-import databaseService from './database.services'
 import Student from '~/models/schemas/student.schema'
-import { ObjectId } from 'mongodb'
+import { getNameFromFullname, processFields } from '~/utils/file'
+import databaseService from './database.services'
 
 class AdminService {
   async getStudents({
@@ -22,7 +21,6 @@ class AdminService {
     sortBy?: string
     sortOrder?: string
   }) {
-    // Tạo điều kiện tìm kiếm
     const searchQuery = search
       ? {
           $or: [
@@ -32,8 +30,6 @@ class AdminService {
           ]
         }
       : {}
-
-    // Tạo điều kiện sắp xếp
     const sortQuery: { [key: string]: 1 | -1 } = {
       [sortBy || 'created_at']: sortOrder === 'ascend' ? 1 : -1
     }
@@ -43,10 +39,7 @@ class AdminService {
       .skip(limit * (page - 1))
       .limit(limit)
       .toArray()
-
-    // Lấy tổng số học sinh
     const total = await databaseService.students.countDocuments(searchQuery)
-
     return {
       total,
       students

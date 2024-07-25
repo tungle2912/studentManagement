@@ -1,0 +1,41 @@
+{
+  "language": "EN",
+  "welcome": "Welcome",
+  "nav_links": {
+    "Home": "Home",
+    "Course": "Course",
+    "Students": "Students",
+    "Payment": "Payment",
+    "Report": "Report",
+    "Settings": "Settings"
+  },
+  "buttons": {
+    "add_student": "Add new student",
+    "logout": "Logout"
+  },
+  "inputs": {
+    "search": {
+      "placeholder": "Search..."
+    },
+    "message": {}
+  },
+  "stats": {
+    "Students": "Students",
+    "Course": "Course",
+    "Payments": "Payment",
+    "Users": "Users"
+  },
+  "titlesTable": {
+    "name": "Name",
+    "email": "Email",
+    "email": "Phone",
+    "enroll_number": "Enroll Number",
+    "date_of_admission": "Date of admission"
+  },
+  "tittles": {
+    "students": "Students List",
+    "courses": "Courses",
+    "payments": "Payments",
+    "users": "Users"
+  }
+}

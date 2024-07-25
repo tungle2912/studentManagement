@@ -31,7 +31,6 @@ function UpdateStudent() {
       const data = studentData?.data?.data?.result
       setIsAdd(false)
       setTittle('Edit Student')
-      console.log('data', data)
       const fileExits = {
         uid: '-1',
         name: 'avatar.png',
@@ -55,13 +54,10 @@ function UpdateStudent() {
 
   const editStudentMutation = useEditStudentMutation()
   const handleEditStudent = async (values: UpdateStudentValus) => {
-    console.log('edit')
-    console.log('value', values)
     const formData = new FormData()
     if (values.image.file.originFileObj) {
       formData.append('image', values.image.file.originFileObj)
     }
-    console.log('img', values.image.file.originFileObj)
     formData.append('name', values.name)
     formData.append('email', values.email)
     formData.append('phone', values.phone)
@@ -71,8 +67,7 @@ function UpdateStudent() {
     await editStudentMutation.mutateAsync(
       { data: formData, studentId: studentId },
       {
-        onSuccess(data) {
-          console.log(data)
+        onSuccess() {
           message.success('Edit student successfully')
           navigate('/admin/students')
         },
@@ -94,9 +89,8 @@ function UpdateStudent() {
     formData.append('enroll_number', values.enroll_number)
     formData.append('date_of_admission', formatDate(values.date_of_admission))
     await addStudentMutation.mutateAsync(formData, {
-      onSuccess(data) {
-        console.log(data)
-        message.success('Edit student successfully')
+      onSuccess() {
+        message.success('Add student successfully')
         navigate('/admin/students')
       },
       onError(error) {

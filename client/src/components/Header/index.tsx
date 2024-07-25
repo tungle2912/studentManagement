@@ -1,36 +1,37 @@
-import { LeftCircleOutlined } from '@ant-design/icons'
+import { GlobalOutlined, LeftCircleOutlined } from '@ant-design/icons'
 import iconBell from '../../assets/icons/Bell.svg'
-
-import styles from './style.module.scss'
-
+import { Button, Dropdown, Menu } from 'antd'
 import Search, { SearchProps } from 'antd/es/input/Search'
+import { changeLanguage } from 'i18next'
+import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import useQueryParams from '../../hooks/useQueryParams'
+import styles from './style.module.scss'
 // type Props = {
 //   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
 // }
+const menu = (
+  <Menu>
+    <Menu.Item key='vi' onClick={() => changeLanguage('vi')}>
+      Vietnamese
+    </Menu.Item>
+    <Menu.Item key='en' onClick={() => changeLanguage('en')}>
+      English
+    </Menu.Item>
+  </Menu>
+)
 function Header() {
-  // const { setIsOpen } = props
-  // const onToggleNavBar = () => {
-  //   setIsOpen((prev: boolean) => !prev)
-  // }
+  const { t } = useTranslation()
   const navigate = useNavigate()
-  const { page, limit, sortBy, sortOrder } = useQueryParams()
+  const { limit, sortBy, sortOrder } = useQueryParams()
   const onSearch: SearchProps['onSearch'] = (value) => {
-    // Các tham số khác
-    // Tạo URL với các tham số tìm kiếm
     const queryParams: { [key: string]: string } = {}
-
-    // Thêm các tham số vào đối tượng chỉ nếu chúng có giá trị
-    if (page) queryParams.page = String(page)
+    queryParams.page = '1'
     if (limit) queryParams.limit = String(limit)
     if (sortBy) queryParams.sortBy = sortBy
     if (sortOrder) queryParams.sortOrder = sortOrder
     if (value) queryParams.search = value
-
-    // Tạo chuỗi truy vấn từ đối tượng
     const query = new URLSearchParams(queryParams).toString()
-    // Điều hướng đến URL mới
     navigate(`/admin/students?${query}`)
   }
   return (
@@ -39,8 +40,11 @@ function Header() {
         <LeftCircleOutlined className={styles.headerIconBack} />
       </div>
       <div className={styles.headerSearch}>
-        <Search className={styles.search} placeholder='Search...' onSearch={onSearch} />
+        <Search className={styles.search} placeholder={t('inputs.search.placeholder')} onSearch={onSearch} />
         <img className={styles.headerIconNotification} src={iconBell} alt='' />
+        <Dropdown className={styles.language} overlay={menu} trigger={['click']}>
+          <Button icon={<GlobalOutlined />}>{t('language')}</Button>
+        </Dropdown>
       </div>
     </div>
   )

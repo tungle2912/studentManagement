@@ -25,5 +25,6 @@ export const icons = {
   sort: sortIcon,
   students: studentsIcon,
   erash: trashIcon,
-  eye: eyeIcon
+  eye: eyeIcon,
+  
 };

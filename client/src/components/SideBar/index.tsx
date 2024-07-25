@@ -6,7 +6,7 @@ import { removeAuthFromCookie } from '../../lib/utils'
 import styles from './style.module.scss'
 import { publicAdminRoutes } from '../../config/admin.routes'
 import { useEffect } from 'react'
-
+import { useTranslation } from 'react-i18next'
 type Props = {
   className?: string
   setIsOpen?: React.Dispatch<React.SetStateAction<boolean>>
@@ -23,6 +23,7 @@ const handleLogout = async () => {
 }
 
 function Sidebar(props: Props) {
+  const { t } = useTranslation()
   const { setIsOpen } = props
 
   const closeNavBar = () => {
@@ -60,7 +61,7 @@ function Sidebar(props: Props) {
                 end
               >
                 <img src={icon} alt='' />
-                <span>{label}</span>
+                <span>{t(`nav_links.${label}`)}</span>
               </NavLink>
             </li>
           ))}
@@ -74,7 +75,7 @@ function Sidebar(props: Props) {
             </div>
           </div>
           <div onClick={handleLogout} className={styles.logOut}>
-            <span className={styles.logOutText}>Logout</span>
+            <span className={styles.logOutText}>{t('buttons.logout')}</span>
             <img className={styles.logOutIcon} src={iconLogOut} alt='' />
           </div>
         </div>

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import StudentHeader from '../../../components/StudentHeader'
 import TableStudent from '../../../components/TableStudent'
 import { useGetAllStudentQuery } from '../../../hooks/data/students.data'
@@ -5,17 +6,13 @@ import useQueryParams from '../../../hooks/useQueryParams'
 import styles from './style.module.scss'
 
 function Students() {
-  const { page, limit, search, sortBy, sortOrder } = useQueryParams()
-  const studentList = useGetAllStudentQuery({
-    page: page,
-    limit: limit,
-    search: search,
-    sortBy: sortBy,
-    sortOrder: sortOrder
-  })
+  const { t } = useTranslation()
+  const param = useQueryParams()
+  const studentList = useGetAllStudentQuery(param)
+
   return (
     <div className={styles.studentContainer}>
-      <StudentHeader text='Students List'></StudentHeader>
+      <StudentHeader text={t('tittles.students')}></StudentHeader>
       <TableStudent
         dataSource={
           studentList?.data?.data?.result || {

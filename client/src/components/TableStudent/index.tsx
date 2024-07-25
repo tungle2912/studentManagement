@@ -8,6 +8,7 @@ import { useDeleteStudentMutation } from '../../hooks/data/students.data'
 import useQueryParams from '../../hooks/useQueryParams'
 import { student } from '../../types/student'
 import styles from './style.module.scss'
+import { useTranslation } from 'react-i18next'
 
 type TableStudentProps = {
   dataSource: {
@@ -18,6 +19,7 @@ type TableStudentProps = {
   }
 }
 function TableStudent({ dataSource }: TableStudentProps) {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const params = Object.fromEntries([...searchParams])
@@ -27,11 +29,8 @@ function TableStudent({ dataSource }: TableStudentProps) {
     try {
       await deleteStudentMutation.mutateAsync(studentId)
       message.success(`Delete student ${name} successfully`)
-
-      // Check if we need to navigate to the previous page
       const currentPage = Number(params.page) || 1
       if (dataSource.students.length === 1 && currentPage > 1) {
-        // Navigate to the previous page if there are no students left on the current page
         navigate({
           pathname: privateAdminRoutes.students,
           search: createSearchParams({
@@ -40,7 +39,6 @@ function TableStudent({ dataSource }: TableStudentProps) {
           }).toString()
         })
       } else {
-        // Reload the current page
         navigate({
           pathname: privateAdminRoutes.students,
           search: createSearchParams({
@@ -60,34 +58,33 @@ function TableStudent({ dataSource }: TableStudentProps) {
       dataIndex: 'avatar',
       render: (text, record) => {
         const avatarSrc = `http://localhost:4000/admin/students/${record.avatar}`
-        console.log(avatarSrc)
         return (
           <Image src={avatarSrc} style={{ height: '55px', width: '65px', objectFit: 'cover', borderRadius: '8px' }} />
         )
       }
     },
     {
-      title: 'Name',
+      title: t('titlesTable.name'),
       dataIndex: 'name',
       sorter: true,
       defaultSortOrder: 'descend'
     },
     {
-      title: 'Email',
+      title: t('titlesTable.email'),
       dataIndex: 'email',
       defaultSortOrder: 'descend',
       sorter: true
     },
     {
-      title: 'Phone',
+      title: t('titlesTable.email'),
       dataIndex: 'phone'
     },
     {
-      title: 'Enroll Number',
+      title: t('titlesTable.enroll_number'),
       dataIndex: 'enroll_number'
     },
     {
-      title: 'Date Of Admission',
+      title: t('titlesTable.date_of_admission'),
       dataIndex: 'date_of_admission'
     },
     {
@@ -118,15 +115,6 @@ function TableStudent({ dataSource }: TableStudentProps) {
       )
     }
   ]
-  // const onPaginationChange = (page: number) => {
-  //   navigate({
-  //     pathname: privateAdminRoutes.students,
-  //     search: createSearchParams({
-  //       ...params,
-  //       page: String(page)
-  //     }).toString()
-  //   })
-  // }
   const { search } = useQueryParams()
   const handleTableChange = (
     pagination: TablePaginationConfig,
