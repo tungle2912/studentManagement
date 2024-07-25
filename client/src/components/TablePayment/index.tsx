@@ -35,7 +35,7 @@ function TablePayment({ payments }: Props) {
             <span className={styles.paymentRowItem}>{payment.name}</span>
           </td>
           <td>
-            <span className={styles.paymentRowItem}>{payment.paymentSchdule}</span>
+            <span className={styles.paymentRowItem}>{payment.paymentSchedule}</span>
           </td>
           <td>
             <span className={styles.paymentRowItem}>{payment.billNumber}</span>

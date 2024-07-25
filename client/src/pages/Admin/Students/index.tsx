@@ -5,8 +5,14 @@ import useQueryParams from '../../../hooks/useQueryParams'
 import styles from './style.module.scss'
 
 function Students() {
-  const { page, limit } = useQueryParams()
-  const studentList = useGetAllStudentQuery({ page: page, limit: limit })
+  const { page, limit, search, sortBy, sortOrder } = useQueryParams()
+  const studentList = useGetAllStudentQuery({
+    page: page,
+    limit: limit,
+    search: search,
+    sortBy: sortBy,
+    sortOrder: sortOrder
+  })
   return (
     <div className={styles.studentContainer}>
       <StudentHeader text='Students List'></StudentHeader>

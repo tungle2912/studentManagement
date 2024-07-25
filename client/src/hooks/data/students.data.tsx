@@ -6,15 +6,21 @@ import { AxiosResponse } from 'axios'
 export const useGetAllStudentQuery = ({
   enabled = true,
   page,
-  limit
+  limit,
+  search,
+  sortBy,
+  sortOrder
 }: {
   page?: number
   limit?: number
   enabled?: boolean
+  search?: string
+  sortBy?: string
+  sortOrder?: string
 }) => {
   return useQuery<AxiosResponse<GetAllStudentResponse, Error>>({
-    queryKey: ['students', { page, limit }],
-    queryFn: () => studentsApi.getAllStudent({ page, limit }),
+    queryKey: ['students', { page, limit, search, sortBy, sortOrder }],
+    queryFn: () => studentsApi.getAllStudent({ page, limit, search, sortBy, sortOrder }),
     enabled: enabled,
     placeholderData: keepPreviousData
   })

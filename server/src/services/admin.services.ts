@@ -9,20 +9,50 @@ import Student from '~/models/schemas/student.schema'
 import { ObjectId } from 'mongodb'
 
 class AdminService {
-  async getStudents({ limit, page }: { limit: number; page: number }) {
+  async getStudents({
+    limit,
+    page,
+    search,
+    sortBy,
+    sortOrder
+  }: {
+    limit: number
+    page: number
+    search?: string
+    sortBy?: string
+    sortOrder?: string
+  }) {
+    // Tạo điều kiện tìm kiếm
+    const searchQuery = search
+      ? {
+          $or: [
+            { name: { $regex: new RegExp(search, 'i') } },
+            { phone: { $regex: new RegExp(search, 'i') } },
+            { email: { $regex: new RegExp(search, 'i') } }
+          ]
+        }
+      : {}
+
+    // Tạo điều kiện sắp xếp
+    const sortQuery: { [key: string]: 1 | -1 } = {
+      [sortBy || 'created_at']: sortOrder === 'ascend' ? 1 : -1
+    }
     const students = await databaseService.students
-      .find({})
-      .sort({ created_at: -1 })
+      .find(searchQuery)
+      .sort(sortQuery)
       .skip(limit * (page - 1))
       .limit(limit)
       .toArray()
 
-    const total = await databaseService.students.countDocuments()
+    // Lấy tổng số học sinh
+    const total = await databaseService.students.countDocuments(searchQuery)
+
     return {
       total,
       students
     }
   }
+
   async uploadImage(file: any) {
     const newName = getNameFromFullname(file.newFilename)
     const newPath = path.resolve(UPLOAD_IMAGE_DIR, `${newName}.jpg`)

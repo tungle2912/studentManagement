@@ -3,11 +3,26 @@ import { GetAllStudentResponse, GetStudentByIdResponse } from '../types/reponses
 import request from './axios'
 
 const studentsApi = {
-  getAllStudent: ({ page, limit }: { page?: number; limit?: number }) => {
+  getAllStudent: ({
+    page,
+    limit,
+    search,
+    sortBy,
+    sortOrder
+  }: {
+    page?: number
+    limit?: number
+    search?: string
+    sortBy?: string
+    sortOrder?: string
+  }) => {
     return request.get<GetAllStudentResponse>('/api/admin/students', {
       params: {
         page: page || 1,
-        limit: limit || 6
+        limit: limit || 6,
+        search: search || '',
+        sortBy: sortBy || 'created_at',
+        sortOrder: sortOrder || 'descend'
       }
     })
   },

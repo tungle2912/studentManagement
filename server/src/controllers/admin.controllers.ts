@@ -5,9 +5,15 @@ import { handleUploadImage } from '~/utils/file'
 export const getALLStudentsController = async (req: Request, res: Response, error: NextFunction) => {
   const limit = Number(req.query.limit)
   const page = Number(req.query.page)
+  const search = req.query.search as string | undefined
+  const sortBy = req.query.sortBy as string | undefined
+  const sortOrder = req.query.sortOrder as 'asc' | 'desc' | undefined
   const result = await adminService.getStudents({
     limit,
-    page
+    page,
+    search,
+    sortBy,
+    sortOrder
   })
 
   res.json({
@@ -21,7 +27,7 @@ export const getALLStudentsController = async (req: Request, res: Response, erro
   })
 }
 export const addStudentController = async (req: Request, res: Response, next: NextFunction) => {
- // const file = await handleUploadImage(req)
+  // const file = await handleUploadImage(req)
   const url = await adminService.uploadImage(req.files.image[0])
   const student = await adminService.addStudent({ req: req, url: url })
   return res.json({

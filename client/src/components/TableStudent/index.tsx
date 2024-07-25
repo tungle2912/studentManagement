@@ -1,9 +1,11 @@
-import { Image, message, Pagination, Popconfirm, Table, TableColumnsType } from 'antd'
+import { Image, message, Popconfirm, Table, TableColumnsType, TablePaginationConfig } from 'antd'
+import { FilterValue, SorterResult } from 'antd/es/table/interface'
 import { createSearchParams, useNavigate, useSearchParams } from 'react-router-dom'
 import pen from '../../assets/icons/pen.svg'
 import trash from '../../assets/icons/trash.svg'
 import { privateAdminRoutes } from '../../config/admin.routes'
 import { useDeleteStudentMutation } from '../../hooks/data/students.data'
+import useQueryParams from '../../hooks/useQueryParams'
 import { student } from '../../types/student'
 import styles from './style.module.scss'
 
@@ -67,14 +69,14 @@ function TableStudent({ dataSource }: TableStudentProps) {
     {
       title: 'Name',
       dataIndex: 'name',
-      sorter: (a, b) => a.name.localeCompare(b.name),
-      sortDirections: ['descend']
+      sorter: true,
+      defaultSortOrder: 'descend'
     },
     {
       title: 'Email',
       dataIndex: 'email',
       defaultSortOrder: 'descend',
-      sorter: (a, b) => a.email.localeCompare(b.email)
+      sorter: true
     },
     {
       title: 'Phone',
@@ -116,24 +118,60 @@ function TableStudent({ dataSource }: TableStudentProps) {
       )
     }
   ]
-  const onPaginationChange = (page: number) => {
-    navigate({
-      pathname: privateAdminRoutes.students,
-      search: createSearchParams({
-        ...params,
-        page: String(page)
-      }).toString()
-    })
+  // const onPaginationChange = (page: number) => {
+  //   navigate({
+  //     pathname: privateAdminRoutes.students,
+  //     search: createSearchParams({
+  //       ...params,
+  //       page: String(page)
+  //     }).toString()
+  //   })
+  // }
+  const { search } = useQueryParams()
+  const handleTableChange = (
+    pagination: TablePaginationConfig,
+    _filters: Record<string, FilterValue | null>, // Không sử dụng filters
+    sorter: SorterResult<student> | SorterResult<student>[]
+  ) => {
+    const newPage = pagination.current || 1
+    const newLimit = pagination.pageSize || 10
+    const newSortBy = Array.isArray(sorter) ? sorter[0]?.field : sorter.field
+    const newSortOrder = Array.isArray(sorter) ? sorter[0]?.order : sorter.order
+    const queryParams: { [key: string]: string } = {}
+    if (newPage) {
+      queryParams.page = String(newPage)
+    }
+    if (newLimit) {
+      queryParams.limit = String(newLimit)
+    }
+    if (newSortBy) {
+      queryParams.sortBy = String(newSortBy)
+    }
+    if (newSortOrder == 'ascend') {
+      queryParams.sortOrder = String(newSortOrder)
+    }
+    if (search) {
+      queryParams.search = String(search)
+    }
+    const query = new URLSearchParams(queryParams).toString()
+    // Điều hướng đến URL mới
+    navigate(`/admin/students?${query}`)
+    // Xử lý sorting và pagination
   }
   return (
     <div className={styles.tableStudent}>
       <Table
         columns={columns}
         dataSource={dataSource.students}
-        pagination={false}
+        onChange={handleTableChange}
         showSorterTooltip={{ target: 'sorter-icon' }}
+        pagination={{
+          current: Number(dataSource.page) || 1,
+          pageSize: dataSource.limit,
+          total: dataSource.total_pages * dataSource.limit
+        }}
       />
-      {dataSource.total_pages > 0 && (
+      {/* {dataSource.total_pages > 0 && (
         <Pagination
           onChange={onPaginationChange}
           className={styles.pagination}
@@ -141,7 +179,7 @@ function TableStudent({ dataSource }: TableStudentProps) {
           pageSize={dataSource.limit}
           total={dataSource.total_pages * dataSource.limit}
         />
-      )}
+      )} */}
     </div>
   )
 }
