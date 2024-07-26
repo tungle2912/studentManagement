@@ -56,8 +56,8 @@ function TableStudent({ dataSource }: TableStudentProps) {
     {
       title: '',
       dataIndex: 'avatar',
-      render: (text, record) => {
-        const avatarSrc = `http://localhost:4000/admin/students/${record.avatar}`
+      render: (url) => {
+        const avatarSrc = `http://localhost:4000/admin/students/${url}`
         return (
           <Image src={avatarSrc} style={{ height: '55px', width: '65px', objectFit: 'cover', borderRadius: '8px' }} />
         )
@@ -76,7 +76,7 @@ function TableStudent({ dataSource }: TableStudentProps) {
       sorter: true
     },
     {
-      title: t('titlesTable.email'),
+      title: t('titlesTable.phone'),
       dataIndex: 'phone'
     },
     {
@@ -108,7 +108,6 @@ function TableStudent({ dataSource }: TableStudentProps) {
             okText='Yes'
             cancelText='No'
           >
-            {' '}
             <img src={trash} style={{ cursor: 'pointer' }} alt='Delete' />
           </Popconfirm>
         </div>

@@ -31,7 +31,7 @@ function Login() {
       values.role = RoleType.User
       UrlNavigate = privateUserRoutes.home
     }
-    const response = await loginMutation.mutateAsync(values, {
+    await loginMutation.mutateAsync(values, {
       onSuccess(data) {
         const { access_token, refresh_token, role } = data?.data?.result ?? {}
         setRefreshTokenToCookie(refresh_token)
@@ -39,7 +39,7 @@ function Login() {
         setRoleToLocalCookie(role)
         setIsAuthenticated(true)
         navigate(UrlNavigate, { replace: true })
-        message.success(response?.data?.message)
+        message.success(data?.data?.message)
       },
       onError(error: any) {
         const errorEmailMessage = error?.response?.data?.errors?.email?.msg

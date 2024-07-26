@@ -13,22 +13,22 @@ function Register() {
   const registerMutation = useRegisterMutation()
 
   const handleRegister = async (values: RegisterValues) => {
-    try {
-      const response = await registerMutation.mutateAsync(values)
-      message.success(response?.data?.message)
-    } catch (error: any) {
-      const errorEmailMessage = error.response?.data?.errors?.email?.msg
-      if (errorEmailMessage) {
-        form.setFields([
-          {
-            name: 'email',
-            errors: [errorEmailMessage]
-          }
-        ])
-      } else {
-        message.error('Register failed. Please check your inputs.')
+     await registerMutation.mutateAsync(values, {
+      onSuccess(data) {
+        message.success(data?.data?.message)
+      },
+      onError(error: any) {
+        const errorEmailMessage = error?.response?.data?.errors?.email?.msg
+        if (errorEmailMessage) {
+          form.setFields([
+            {
+              name: 'email',
+              errors: [errorEmailMessage]
+            }
+          ])
+        }
       }
-    }
+    })
   }
 
   const onFinishFailed = (errorInfo: any) => {

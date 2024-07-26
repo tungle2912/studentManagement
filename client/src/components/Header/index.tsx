@@ -7,9 +7,8 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import useQueryParams from '../../hooks/useQueryParams'
 import styles from './style.module.scss'
-// type Props = {
-//   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
-// }
+import { useEffect, useState } from 'react'
+
 const menu = (
   <Menu>
     <Menu.Item key='vi' onClick={() => changeLanguage('vi')}>
@@ -20,10 +19,19 @@ const menu = (
     </Menu.Item>
   </Menu>
 )
+
 function Header() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { limit, sortBy, sortOrder } = useQueryParams()
+  const { limit, sortBy, sortOrder, search } = useQueryParams()
+  const [searchValue, setSearchValue] = useState<string>('')
+
+  useEffect(() => {
+    if (search) {
+      setSearchValue(search)
+    }
+  }, [search])
+
   const onSearch: SearchProps['onSearch'] = (value) => {
     const queryParams: { [key: string]: string } = {}
     queryParams.page = '1'
@@ -34,13 +42,20 @@ function Header() {
     const query = new URLSearchParams(queryParams).toString()
     navigate(`/admin/students?${query}`)
   }
+
   return (
     <div className={styles.header}>
       <div>
         <LeftCircleOutlined className={styles.headerIconBack} />
       </div>
       <div className={styles.headerSearch}>
-        <Search className={styles.search} placeholder={t('inputs.search.placeholder')} onSearch={onSearch} />
+        <Search
+          className={styles.search}
+          placeholder={t('inputs.search.placeholder')}
+          onSearch={onSearch}
+          value={searchValue}  // Gán giá trị tìm kiếm vào ô tìm kiếm
+          onChange={(e) => setSearchValue(e.target.value)}  // Cập nhật giá trị tìm kiếm khi người dùng gõ
+        />
         <img className={styles.headerIconNotification} src={iconBell} alt='' />
         <Dropdown className={styles.language} overlay={menu} trigger={['click']}>
           <Button icon={<GlobalOutlined />}>{t('language')}</Button>

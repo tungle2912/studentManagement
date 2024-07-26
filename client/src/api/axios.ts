@@ -41,7 +41,6 @@ class Request {
 
     this.instance.interceptors.response.use(
       (response) => {
-
         return response
       },
       (error: AxiosError) => {
@@ -82,7 +81,7 @@ class Request {
         refresh_token: this.refreshToken
       })
       .then((res) => {
-        const { access_token, refresh_token } = res.data.result as { access_token: string; refresh_token: string; }
+        const { access_token, refresh_token } = res.data.result as { access_token: string; refresh_token: string }
         console.log('refresh', access_token)
         this.accessToken = access_token
         setAccessTokenToLocalCookie(access_token)

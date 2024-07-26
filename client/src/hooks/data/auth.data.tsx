@@ -1,5 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
 import { authApi } from '../../api/auth.api'
+import { handleError } from '../../lib/utils'
 export const useLoginMutation = () => {
   return useMutation({ mutationFn: authApi.login })
 }
@@ -19,5 +20,5 @@ export const useVerifyOtpForgotPasswordMutation = () => {
   return useMutation({ mutationFn: authApi.verifyOtpForgotPassword })
 }
 export const useResetPasswordMutation = () => {
-  return useMutation({ mutationFn: authApi.resetPassword })
+  return useMutation({ mutationFn: authApi.resetPassword, onError: handleError })
 }

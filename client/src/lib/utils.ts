@@ -2,7 +2,7 @@ import axios, { AxiosError } from 'axios'
 import Cookies from 'js-cookie'
 import HTTP_RESPONSE_STATUS_CODES from '../constants/httpStatus'
 import { ErrorResponse } from '../types/reponses'
-
+import { message } from 'antd'
 
 export const formatNumber = (number: number) => new Intl.NumberFormat().format(number)
 
@@ -69,6 +69,13 @@ export const removeAuthFromCookie = () => {
 export const isAdminRoute = (pathname: string) => {
   return pathname.includes('/admin')
 }
-export const handleError = (error: AxiosError) => {
-  console.log(error)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const handleError = (error: any) => {
+  if (error?.response?.data?.message) {
+    return message.error(error.response.data.message)
+  } else if (error?.message) {
+    return message.error(error.message)
+  } else {
+    return message.error('Something went wrong')
+  }
 }

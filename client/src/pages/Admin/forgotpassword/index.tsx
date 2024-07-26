@@ -94,54 +94,60 @@ function Forgotpassword() {
   // })
 
   const dandleSendOtp = async (values: sendOtpForgotPasswordValues) => {
-    try {
-      form.resetFields(['otp'])
-      const response = await sendOtpMutation.mutateAsync(values)
-      setOtp_id(`${response?.data?.result}`)
-      message.success(`${response?.data?.message}`)
-      setOtpVisible(true)
-    } catch (error: any) {
-      const errorEmailMessage = error.response?.data?.errors?.email?.msg
-      if (errorEmailMessage) {
-        form.setFields([
-          {
-            name: 'email',
-            errors: [errorEmailMessage]
-          }
-        ])
+    form.resetFields(['otp'])
+    await sendOtpMutation.mutateAsync(values, {
+      onSuccess: (response) => {
+        setOtp_id(`${response?.data?.result}`)
+        message.success(`${response?.data?.message}`)
+        setOtpVisible(true)
+      },
+      onError: (error: any) => {
+        const errorEmailMessage = error.response?.data?.errors?.email?.msg
+        if (errorEmailMessage) {
+          form.setFields([
+            {
+              name: 'email',
+              errors: [errorEmailMessage]
+            }
+          ])
+        }
       }
-    }
+    })
   }
 
   const handleVerifyOtp = async (values: verifyOtpForgotPasswordValues) => {
-    try {
-      const response = await verifyOtpMutation.mutateAsync(values)
-      message.success(response?.data?.message || 'OTP verified successfully.')
-      setResetPasswordVisible(true)
-      setOtpVisible(false)
-      setButtonResetPasswordEnabled(false)
-    } catch (error: any) {
-      const errorOtpMessage = error.response?.data?.errors?.otp?.msg
-      if (errorOtpMessage) {
-        form.setFields([
-          {
-            name: 'otp',
-            errors: [errorOtpMessage]
-          }
-        ])
+    await verifyOtpMutation.mutateAsync(values, {
+      onSuccess: (response) => {
+        message.success(response?.data?.message || 'OTP verified successfully.')
+        setResetPasswordVisible(true)
+        setOtpVisible(false)
+        setButtonResetPasswordEnabled(false)
+      },
+      onError: (error: any) => {
+        const errorOtpMessage = error.response?.data?.errors?.otp?.msg
+        if (errorOtpMessage) {
+          form.setFields([
+            {
+              name: 'otp',
+              errors: [errorOtpMessage]
+            }
+          ])
+        }
       }
-    }
+    })
   }
 
   const handleResetPassword = async (values: resetPasswordValues) => {
-    try {
-      values.otp_id = otp_id
-      const response = await resetPasswordMutation.mutateAsync(values)
-      message.success(response?.data?.message || 'Password reset successful.')
-      navigate('/login')
-    } catch (error: any) {
-      message.error(error.response?.data?.errors?.message || 'Failed to reset password. Please try again.')
-    }
+    values.otp_id = otp_id
+    await resetPasswordMutation.mutateAsync(values, {
+      onSuccess: (response) => {
+        message.success(response?.data?.message || 'Password reset successful.')
+        navigate('/login')
+      }
+      // onError: (error: any) => {
+      //   message.error(error.response?.data?.errors?.message || 'Failed to reset password. Please try again.')
+      // }
+    })
   }
   const senOtp = () => {
     form.validateFields(['email']).then((values) => {

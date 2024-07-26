@@ -28,7 +28,7 @@
   "titlesTable": {
     "name": "Name",
     "email": "Email",
-    "email": "Phone",
+    "phone": "Phone",
     "enroll_number": "Enroll Number",
     "date_of_admission": "Date of admission"
   },
