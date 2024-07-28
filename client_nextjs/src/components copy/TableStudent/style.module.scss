@@ -1,0 +1,22 @@
+.tableStudent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: auto;
+}
+:global(.ant-table-wrapper) {
+  max-width: 13760px;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+  .tableStudent {
+    overflow-x: auto;
+    padding: 0px 15px;
+    overflow-y: auto;
+    // height: 100%;
+    // position: relative;
+    width: 100vw;
+  }
+}

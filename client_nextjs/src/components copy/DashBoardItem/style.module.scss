@@ -1,0 +1,44 @@
+.dashBoardItem {
+  width: calc((100% - 150px) / 4);
+  min-width: 250px;
+  height: 157px;
+  background-repeat: no-repeat;
+  background-size: cover;
+  margin: 30px 15px 0px 15px;
+  border-radius: 8px;
+  display: flex;
+  position: relative;
+  .dashBoardItemContent {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    padding-top: 20px;
+    .dashBoardItemImg {
+      width: 50%;
+      height: 30%;
+      padding-bottom: 15px;
+    }
+    .dashBoardItemText {
+      padding-left: 20px;
+    }
+  }
+  .dashBoardItemCount {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 36.57px;
+    text-align: left;
+    font-family: MontserratBold;
+    color: black!important;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashBoardItem {
+    height: 200px;
+    width: 100%;
+  }
+}
