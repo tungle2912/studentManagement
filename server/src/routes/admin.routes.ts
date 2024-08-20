@@ -21,7 +21,7 @@ adminRouter.post(
   '/student/add',
   adminValidator,
   handleRequest,
-  addStudentValidator,
+ // addStudentValidator,
   wrapRequestHandler(addStudentController)
 )
 

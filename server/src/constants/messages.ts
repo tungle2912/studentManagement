@@ -47,6 +47,5 @@ export const AUTH_MESSAGES = {
   RESET_PASSWORD_SUCCESS: 'Reset password success',
   GET_ME_SUCCESS: 'Get my profile success',
   USER_NOT_VERIFIED: 'User not verified',
-  PERMISSION_DENIED: 'Permission denied',
+  PERMISSION_DENIED: 'Permission denied'
 } as const
-

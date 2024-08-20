@@ -29,7 +29,8 @@ export const getALLStudentsController = async (req: Request, res: Response, erro
 export const addStudentController = async (req: Request, res: Response, next: NextFunction) => {
   // const file = await handleUploadImage(req)
   const url = await adminService.uploadImage(req.files.image[0])
-  const student = await adminService.addStudent({ req: req, url: url })
+  req.body.avatar = url
+  const student = await adminService.addStudent(req.body)
   return res.json({
     message: 'Upload image successfully',
     result: student
@@ -43,15 +44,12 @@ export const getStudentByIdController = async (req: Request, res: Response, next
   })
 }
 export const editStudentController = async (req: Request, res: Response, next: NextFunction) => {
-  console.log('body1', req.body)
-  console.log('params1', req.params)
-  console.log('file', req.files)
   let url = ''
   if (Object.keys(req.files).length !== 0) {
     url = await adminService.uploadImage(req.files.image[0])
+    req.body.avatar = url
   }
-  console.log('reqbody', req.body)
-  const result = await adminService.editStudent({ studentId: req.params.studentId, data: req.body, urlImage: url })
+  const result = await adminService.editStudent({ studentId: req.params.studentId, data: req.body })
   return res.json({
     message: 'Get student by id successfully',
     result

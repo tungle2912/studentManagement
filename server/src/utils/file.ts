@@ -1,7 +1,7 @@
 import { UPLOAD_IMAGE_DIR, UPLOAD_IMAGE_TEMP_DIR } from '~/constants/dir'
 import fs from 'fs'
 import { Request } from 'express'
-import { File } from 'formidable'
+import formidable, { File } from 'formidable'
 import Student from '~/models/schemas/student.schema'
 export const initFolder = () => {
   if (!fs.existsSync(UPLOAD_IMAGE_TEMP_DIR)) {
@@ -21,7 +21,7 @@ export const handleUploadImage = async (req: Request) => {
     uploadDir: UPLOAD_IMAGE_TEMP_DIR,
     maxFiles: 1,
     keepExtensions: true,
-    maxFileSize: 3000 * 1024, // 300KB
+    maxFileSize: 3000 * 1024 // 300KB
     // filter: function ({ name, originalFilename, mimetype }) {
     //   const valid = name === 'image' && Boolean(mimetype?.startsWith('image/'))
     //   if (!valid) {
@@ -57,3 +57,22 @@ export const processFields = (input: Record<string, any>) => {
   }
   return processedFields
 }
+import { UploadApiResponse, v2 as cloudinary } from 'cloudinary'
+import streamifier from 'streamifier'
+
+const uploadToCloudinary = (file: any) => {
+  return new Promise<UploadApiResponse>((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream((error, result) => {
+      if (result) {
+        resolve(result)
+      } else {
+        console.log('err')
+        reject(error)
+      }
+    })
+
+    streamifier.createReadStream(file.filepath).pipe(stream)
+  })
+}
+
+export default uploadToCloudinary

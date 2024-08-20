@@ -57,9 +57,9 @@ function TableStudent({ dataSource }: TableStudentProps) {
       title: '',
       dataIndex: 'avatar',
       render: (url) => {
-        const avatarSrc = `http://localhost:4000/admin/students/${url}`
+      //  const avatarSrc = `http://localhost:4000/admin/students/${url}`
         return (
-          <Image src={avatarSrc} style={{ height: '55px', width: '65px', objectFit: 'cover', borderRadius: '8px' }} />
+          <Image src={url} style={{ height: '55px', width: '65px', objectFit: 'cover', borderRadius: '8px' }} />
         )
       }
     },
