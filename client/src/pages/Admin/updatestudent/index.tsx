@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { PlusOutlined } from '@ant-design/icons'
-import { Button, DatePicker, Form, message, Upload, UploadFile } from 'antd'
+import { Button, DatePicker, Form, message, Spin, Upload, UploadFile } from 'antd'
 import { format } from 'date-fns'
 import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
@@ -25,7 +25,7 @@ function UpdateStudent() {
   const [tittile, setTittle] = useState('Add New Student')
   const studentData = useGetStudentByIdQuery({ studentId: id || '', enabled: Boolean(id) })
   const [fileList, setFileList] = useState<UploadFile[]>([])
-
+  const [loading, setLoading] = useState(false) // Thêm state cho loading
   useEffect(() => {
     if (studentData.data) {
       const data = studentData?.data?.data?.result
@@ -35,7 +35,7 @@ function UpdateStudent() {
         uid: '-1',
         name: 'avatar.png',
         status: 'done',
-        url: `http://localhost:4000/admin/students/${data.avatar}`
+        url: data.avatar
       } as UploadFile
       form.setFieldsValue({
         name: data.name,
@@ -55,6 +55,7 @@ function UpdateStudent() {
   const editStudentMutation = useEditStudentMutation()
   const handleEditStudent = async (values: UpdateStudentValus) => {
     const formData = new FormData()
+    setLoading(true) // Bật trạng thái loading
     if (values.image.file.originFileObj) {
       formData.append('image', values.image.file.originFileObj)
     }
@@ -73,6 +74,9 @@ function UpdateStudent() {
         },
         onError(error) {
           console.log(error)
+        },
+        onSettled() {
+          setLoading(false) // Tắt trạng thái loading sau khi xử lý xong
         }
       }
     )
@@ -80,6 +84,7 @@ function UpdateStudent() {
   const addStudentMutation = useAddStudentMutation()
   const handleAddStudent = async (values: UpdateStudentValus) => {
     console.log('add')
+    setLoading(true) // Bật trạng thái loading
     const formData = new FormData()
     console.log('values', values)
     formData.append('image', values.image.file.originFileObj)
@@ -95,6 +100,9 @@ function UpdateStudent() {
       },
       onError(error) {
         console.log(error)
+      },
+      onSettled() {
+        setLoading(false) // Tắt trạng thái loading sau khi xử lý xong
       }
     })
   }
@@ -109,6 +117,13 @@ function UpdateStudent() {
 
   return (
     <div className={styles.updateStudentContainer}>
+      {loading && (
+        <div className={styles.spinnerOverlay}>
+          {' '}
+          {/* Thêm overlay cho spinner */}
+          <Spin size='large' /> {/* Spinner lớn */}
+        </div>
+      )}
       <Tittle className={styles.tittleUpdateStudent} text={tittile}></Tittle>
       <Form
         form={form}
@@ -143,7 +158,7 @@ function UpdateStudent() {
           </Upload>
         </Form.Item>
         <Form.Item wrapperCol={{ offset: 4, span: 14 }}>
-          <Button htmlType='submit' className={styles.buttonSubmit}>
+          <Button htmlType='submit' className={styles.buttonSubmit} loading={loading}>
             Submit
           </Button>
           <Button className={styles.buttonReset} onClick={() => form.resetFields()}>

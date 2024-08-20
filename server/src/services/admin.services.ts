@@ -1,11 +1,7 @@
-import { Request } from 'express'
 import { ObjectId } from 'mongodb'
-import path from 'path'
-import sharp from 'sharp'
-import { UPLOAD_IMAGE_DIR } from '~/constants/dir'
 import Student from '~/models/schemas/student.schema'
-import { getNameFromFullname, processFields } from '~/utils/file'
 import databaseService from './database.services'
+import cloudinary from '~/utils/cloudinary'
 
 class AdminService {
   async getStudents({
@@ -47,36 +43,38 @@ class AdminService {
   }
 
   async uploadImage(file: any) {
-    const newName = getNameFromFullname(file.newFilename)
-    const newPath = path.resolve(UPLOAD_IMAGE_DIR, `${newName}.jpg`)
-    await sharp(file.filepath).jpeg().toFile(newPath)
-    // try {
-    //   fs.unlinkSync(file.filepath);
-    // } catch (error) {
-    //   console.log('err', error)
-    // }
-    return `${newName}.jpg`
-  }
-  async addStudent({ req, url }: { req: Request; url: string }) {
-    const processedFields: Record<string, string> = {}
-    for (const [key, value] of Object.entries(req.body)) {
-      processedFields[key] = Array.isArray(value) ? value[0] : (value as string)
+    try {
+      const result = await cloudinary.uploader.upload(file.filepath)
+      return result.secure_url
+    } catch (err) {
+      throw new Error(`Upload failed`)
     }
-    const student = processFields(processedFields)
-    student.avatar = url
+  }
+  // const newName = getNameFromFullname(file.newFilename)
+  // const newPath = path.resolve(UPLOAD_IMAGE_DIR, `${newName}.jpg`)
+  // await sharp(file.filepath).jpeg().toFile(newPath)
+  // try {
+  //   fs.unlinkSync(file.filepath);
+  // } catch (error) {
+  //   console.log('err', error)
+  // }
+
+  //  return `${newName}.jpg`
+  //}
+  async addStudent(data: Student) {
     const newStudent = new Student({
-      name: student.name,
-      email: student.email,
-      phone: student.phone,
-      enroll_number: student.enroll_number,
-      date_of_admission: student.date_of_admission,
-      avatar: student.avatar
+      name: data.name,
+      email: data.email,
+      phone: data.phone,
+      enroll_number: data.enroll_number,
+      date_of_admission: data.date_of_admission,
+      avatar: data.avatar
     })
     await databaseService.students.insertOne(newStudent)
     return newStudent
   }
-  async editStudent({ studentId, data, urlImage }: { studentId: string; data: Student; urlImage: string }) {
-    if (urlImage == '') {
+  async editStudent({ studentId, data }: { studentId: string; data: Student }) {
+    if (data.avatar == '') {
       await databaseService.students.updateOne({ _id: new ObjectId(studentId) }, [
         {
           $set: {
@@ -97,7 +95,7 @@ class AdminService {
             phone: data.phone,
             enroll_number: data.enroll_number,
             date_of_admission: data.date_of_admission,
-            avatar: urlImage
+            avatar: data.avatar
           }
         }
       ])
@@ -118,8 +116,30 @@ class AdminService {
     const student = await databaseService.students.findOne({ _id: new ObjectId(studentId) })
     return student
   }
-  async deleteStudent(studentId: string) {
-    await databaseService.students.deleteOne({ _id: new ObjectId(studentId) })
+  deleteStudent = async (studentId: string) => {
+    try {
+      // 1. Tìm kiếm student bằng studentId để lấy avatar URL
+      const student = await databaseService.students.findOne({ _id: new ObjectId(studentId) })
+
+      if (!student) {
+        throw new Error('Student not found')
+      }
+
+      // 2. Trích xuất public_id từ URL của avatar
+      const avatarUrl = student.avatar
+      const publicId = avatarUrl.split('/').pop()?.split('.')[0]
+
+      // 3. Xóa ảnh khỏi Cloudinary
+      if (publicId) {
+        await cloudinary.uploader.destroy(publicId)
+      }
+
+      // 4. Xóa student khỏi cơ sở dữ liệu
+      await databaseService.students.deleteOne({ _id: new ObjectId(studentId) })
+    } catch (error) {
+      console.error('Error deleting student or image:', error)
+      throw error // Quăng lỗi để controller xử lý
+    }
   }
 }
 const adminService = new AdminService()
